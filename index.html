@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>WhiteMoon · Kit de Ventas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --p:#8b5cf6;--p2:#7c3aed;--accent:#c084fc;
+  --green:#22c55e;--green2:#86efac;
+  --orange:#f97316;--red:#ef4444;
+  --bg:#07070e;--bg1:#0a0a14;--bg2:#0d0d1a;
+  --card:#111120;--text:#f0effe;--text2:#9090b0;
+  --muted:#404060;--border:rgba(139,92,246,.15);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;user-select:none}
+
+/* ── SETUP SCREEN ── */
+#setup{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.setup-logo{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px}
+.setup-logo span{color:var(--accent)}
+.setup-sub{font-size:.82rem;color:var(--text2);margin-bottom:32px}
+.setup-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+.setup-input{padding:13px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border .2s}
+.setup-input:focus{border-color:var(--p)}
+.setup-input::placeholder{color:var(--muted)}
+.setup-select{padding:13px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;appearance:none;cursor:pointer}
+.setup-btn{padding:15px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .2s}
+.setup-btn:active{transform:scale(.97)}
+.setup-note{font-size:.7rem;color:var(--muted);margin-top:8px}
+
+/* ── SLIDES ── */
+#slides{position:fixed;inset:0;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;transform:translateX(60px)}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.slide.prev{opacity:0;transform:translateX(-60px)}
+
+/* ── NAV ── */
+.slide-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 20px 20px;background:linear-gradient(0deg,rgba(7,7,14,.98) 0%,transparent 100%);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-dots{display:flex;gap:6px;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:all .3s;cursor:pointer}
+.dot.active{width:20px;border-radius:3px;background:var(--p)}
+.nav-btn{padding:10px 22px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s}
+.nav-btn:active{transform:scale(.95)}
+.btn-prev{background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
+.btn-next{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:10px 28px}
+.slide-counter{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted)}
+
+/* ── SLIDE COMMON ── */
+.s-wrap{padding:24px 20px 100px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.s-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);border-radius:20px;font-size:.65rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.s-title{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,6vw,2.4rem);font-weight:900;line-height:1.05;letter-spacing:-.03em;color:#fff;margin-bottom:10px}
+.s-title .grad{background:linear-gradient(135deg,var(--accent),#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.s-sub{font-size:.85rem;color:var(--text2);line-height:1.65;margin-bottom:24px}
+.biz-name{color:var(--accent);font-weight:700}
+
+/* ── SLIDE 1: PORTADA ── */
+#s1{background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,.2) 0%,transparent 60%),var(--bg)}
+.s1-logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.s1-logo svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
+.s1-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,8vw,3.5rem);font-weight:900;line-height:1;letter-spacing:-.04em;color:#fff;margin-bottom:12px}
+.s1-sub{font-size:.9rem;color:var(--text2);line-height:1.6;margin-bottom:32px;max-width:320px}
+.s1-divider{width:40px;height:3px;background:linear-gradient(90deg,var(--p),var(--accent));border-radius:2px;margin-bottom:24px}
+.s1-biz{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+.s1-sector{font-size:.78rem;color:var(--text2)}
+.s1-wm{position:absolute;bottom:100px;right:20px;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted)}
+
+/* ── SLIDE 2: DIAGNÓSTICO ── */
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.diag-card{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border)}
+.diag-card.bad{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)}
+.diag-card.good{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05)}
+.diag-ico{font-size:1.4rem;margin-bottom:6px}
+.diag-label{font-size:.68rem;font-weight:700;color:var(--text2);margin-bottom:2px;letter-spacing:.05em}
+.diag-val{font-size:.82rem;font-weight:600}
+.diag-val.red{color:#ef4444}.diag-val.green{color:#22c55e}.diag-val.orange{color:#f97316}
+.score-ring{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.score-num{font-family:'Syne',sans-serif;font-size:4rem;font-weight:900;line-height:1}
+.score-label{font-size:.72rem;color:var(--text2);margin-top:4px}
+.score-bar{width:100%;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-top:12px}
+.score-fill{height:100%;border-radius:4px;transition:width 1s ease}
+
+/* ── SLIDE 3: EL PROBLEMA ── */
+.problem-list{display:flex;flex-direction:column;gap:10px}
+.problem-item{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.problem-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#ef4444}
+.prob-ico{width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prob-ico svg{width:15px;height:15px;stroke:#ef4444;fill:none;stroke-width:2}
+.prob-text{font-size:.8rem;color:var(--text);line-height:1.5}
+.prob-text b{color:#ff8da0}
+.prob-cost{font-size:.68rem;color:#ef4444;font-family:'Space Mono',monospace;margin-top:4px}
+
+/* ── SLIDE 4: DINERO PERDIDO ── */
+.money-hero{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.02));border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
+.money-amount{font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:900;color:#ef4444;line-height:1;margin-bottom:6px}
+.money-label{font-size:.78rem;color:var(--text2)}
+.money-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.money-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.money-item-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#f97316}
+.money-item-label{font-size:.68rem;color:var(--text2);margin-top:3px;line-height:1.3}
+
+/* ── SLIDE 5: LA SOLUCIÓN ── */
+.solution-card{background:linear-gradient(135deg,rgba(139,92,246,.08),var(--card));border:1px solid rgba(139,92,246,.3);border-radius:16px;padding:20px;margin-bottom:12px}
+.sol-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sol-ico{width:40px;height:40px;border-radius:10px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sol-ico svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:1.8}
+.sol-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff}
+.sol-price{font-size:.7rem;color:var(--accent);font-family:'Space Mono',monospace;margin-top:2px}
+.sol-features{display:flex;flex-direction:column;gap:6px}
+.sol-feat{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--text2)}
+.sol-feat svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:2.5;flex-shrink:0}
+
+/* ── SLIDE 6: ROI ── */
+.roi-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:20px}
+.roi-col{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.roi-col.after{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)}
+.roi-col-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+.roi-col.after .roi-col-label{color:var(--green2)}
+.roi-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:900;line-height:1}
+.roi-num.red{color:#ef4444}.roi-num.green{color:#22c55e}
+.roi-num-label{font-size:.65rem;color:var(--text2);margin-top:3px}
+.vs-circle{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--text2)}
+.roi-payback{background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.02));border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:18px;text-align:center}
+.roi-payback-num{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:900;color:#22c55e}
+.roi-payback-label{font-size:.76rem;color:var(--text2);margin-top:4px}
+
+/* ── SLIDE 7: ANTES / DESPUÉS ── */
+.ab-container{display:flex;flex-direction:column;gap:10px}
+.ab-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ab-header{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.ab-label{text-align:center;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px;border-radius:8px}
+.ab-label.before{background:rgba(239,68,68,.1);color:#ef4444}
+.ab-label.after{background:rgba(34,197,94,.1);color:#22c55e}
+.ab-item{background:var(--card);border-radius:10px;padding:10px 12px;font-size:.76rem;display:flex;align-items:center;gap:8px;line-height:1.3}
+.ab-item.bad{border:1px solid rgba(239,68,68,.2);color:var(--text2)}
+.ab-item.good{border:1px solid rgba(34,197,94,.2);color:var(--text)}
+.ab-item svg{width:13px;height:13px;flex-shrink:0}
+.ab-item.bad svg{stroke:#ef4444;fill:none;stroke-width:2}
+.ab-item.good svg{stroke:#22c55e;fill:none;stroke-width:2}
+
+/* ── SLIDE 8: CASOS DE ÉXITO ── */
+.case-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px}
+.case-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.case-avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.case-biz{font-size:.85rem;font-weight:700;color:#fff}
+.case-sector{font-size:.68rem;color:var(--text2)}
+.case-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.case-stat{text-align:center}
+.case-stat-num{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--green2)}
+.case-stat-label{font-size:.6rem;color:var(--text2);margin-top:2px;line-height:1.3}
+.case-quote{font-size:.74rem;color:var(--text2);font-style:italic;line-height:1.55;border-left:2px solid var(--p);padding-left:10px;margin-top:10px}
+
+/* ── SLIDE 9: PRECIO ── */
+.price-card{background:linear-gradient(135deg,rgba(139,92,246,.08),var(--card));border:1px solid rgba(139,92,246,.35);border-radius:18px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden}
+.price-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--accent))}
+.price-tag{display:inline-block;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:10px;letter-spacing:.1em;margin-bottom:14px}
+.price-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:6px}
+.price-amount{font-family:'Syne',sans-serif;font-size:3.2rem;font-weight:900;color:#fff;line-height:1}
+.price-amount span{font-size:1rem;color:var(--text2);font-weight:400}
+.price-setup{font-size:.72rem;color:var(--text2);margin-top:4px;margin-bottom:18px}
+.price-features{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:20px}
+.price-feat{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text2)}
+.price-feat svg{width:14px;height:14px;stroke:var(--green);fill:none;stroke-width:2.5;flex-shrink:0}
+.price-cta{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;transition:all .2s;text-decoration:none}
+.price-cta:active{transform:scale(.97)}
+.price-note{font-size:.68rem;color:var(--muted);text-align:center;margin-top:10px}
+
+/* ── SLIDE 10: CIERRE ── */
+#s10{background:radial-gradient(ellipse at 70% 80%,rgba(124,58,237,.2) 0%,transparent 60%),var(--bg)}
+.close-emoji{font-size:3rem;margin-bottom:16px;display:block}
+.close-steps{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.close-step{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.step-num{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.step-text{font-size:.8rem;color:var(--text2);line-height:1.4}
+.step-text b{color:var(--text)}
+.close-wa{display:flex;align-items:center;justify-content:center;gap:9px;padding:16px;background:linear-gradient(135deg,#25d366,#128c7e);border:none;border-radius:14px;color:#fff;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;margin-top:8px;text-decoration:none;transition:all .2s}
+.close-wa:active{transform:scale(.97)}
+.close-wa svg{width:20px;height:20px;fill:#fff}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.slide.active .s-wrap>*{animation:fadeInUp .4s ease both}
+.slide.active .s-wrap>*:nth-child(1){animation-delay:.05s}
+.slide.active .s-wrap>*:nth-child(2){animation-delay:.1s}
+.slide.active .s-wrap>*:nth-child(3){animation-delay:.15s}
+.slide.active .s-wrap>*:nth-child(4){animation-delay:.2s}
+.slide.active .s-wrap>*:nth-child(5){animation-delay:.25s}
+
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup">
+  <div style="margin-bottom:32px">
+    <div class="setup-logo"><span>White</span>Moon · Kit de Ventas</div>
+    <div class="setup-sub">Rellena los datos del cliente antes de la visita</div>
+  </div>
+  <div class="setup-form">
+    <input class="setup-input" id="s-biz" placeholder="Nombre del negocio" autocomplete="off">
+    <input class="setup-input" id="s-contact" placeholder="Nombre del contacto (opcional)" autocomplete="off">
+    <select class="setup-select" id="s-sector">
+      <option value="">Sector del negocio...</option>
+      <option value="dental">🦷 Clínica Dental</option>
+      <option value="restaurante">🍽️ Restaurante</option>
+      <option value="belleza">💅 Centro de Estética</option>
+      <option value="peluqueria">✂️ Peluquería</option>
+      <option value="abogado">⚖️ Despacho de Abogados</option>
+      <option value="gestoria">📊 Gestoría / Asesoría</option>
+      <option value="taller">🚗 Taller Mecánico</option>
+      <option value="veterinaria">🐾 Clínica Veterinaria</option>
+      <option value="inmobiliaria">🏠 Inmobiliaria</option>
+      <option value="academia">📚 Academia / Formación</option>
+      <option value="gimnasio">💪 Gimnasio / Fitness</option>
+      <option value="farmacia">💊 Farmacia</option>
+      <option value="fisioterapia">🦴 Fisioterapia</option>
+      <option value="hotel">🏨 Hotel / Alojamiento</option>
+      <option value="otro">🏪 Otro negocio</option>
+    </select>
+    <select class="setup-select" id="s-score">
+      <option value="">Situación actual de su web...</option>
+      <option value="sin-web">Sin web o muy básica</option>
+      <option value="sin-chatbot">Web OK pero sin chatbot</option>
+      <option value="sin-wa">Sin WhatsApp Business</option>
+      <option value="todo-mal">Sin web, sin chatbot, sin WA</option>
+    </select>
+    <button class="setup-btn" onclick="startPresentation()">
+      ⚡ Iniciar presentación
+    </button>
+    <div class="setup-note">La presentación se adapta automáticamente al sector</div>
+  </div>
+</div>
+
+<!-- SLIDES -->
+<div id="slides">
+
+  <!-- S1: PORTADA -->
+  <div class="slide" id="s1">
+    <div class="s-wrap" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
+      <div class="s1-logo">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.15em;margin-bottom:12px">WHITEMOON AGENCIA IA</div>
+      <div class="s1-title">Cómo la IA<br>va a transformar<br><span style="background:linear-gradient(135deg,#c084fc,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">tu negocio</span></div>
+      <div class="s1-divider" style="margin:16px 0"></div>
+      <div class="s1-biz" id="p-biz-1">Nombre del negocio</div>
+      <div class="s1-sector" id="p-sector-1">Sector</div>
+      <div class="s1-wm">whitemoon.es · Majadahonda, Madrid</div>
+    </div>
+  </div>
+
+  <!-- S2: DIAGNÓSTICO -->
+  <div class="slide" id="s2">
+    <div class="s-wrap">
+      <div class="s-badge">📊 Diagnóstico digital</div>
+      <div class="s-title">Así está tu<br>negocio <span class="grad">ahora mismo</span></div>
+      <div class="s-sub">Hemos analizado tu presencia digital. Este es el resultado:</div>
+      <div class="score-ring">
+        <div class="score-num" id="p-score" style="color:#ef4444">0%</div>
+        <div class="score-label">Puntuación digital (sobre 100)</div>
+        <div class="score-bar"><div class="score-fill" id="p-score-bar" style="width:0%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+      </div>
+      <div class="diag-grid" id="p-diag-grid">
+        <!-- generado por JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: EL PROBLEMA -->
+  <div class="slide" id="s3">
+    <div class="s-wrap">
+      <div class="s-badge">⚠️ El problema</div>
+      <div class="s-title">Lo que te está<br>costando <span class="grad">dinero</span></div>
+      <div class="s-sub" id="p-contact-greeting">Cada día sin IA digital, pierdes clientes que van a tu competencia.</div>
+      <div class="problem-list" id="p-problems">
+        <!-- generado por JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- S4: DINERO PERDIDO -->
+  <div class="slide" id="s4">
+    <div class="s-wrap">
+      <div class="s-badge">💸 Impacto económico</div>
+      <div class="s-title">Cuánto estás<br><span class="grad">perdiendo al mes</span></div>
+      <div class="money-hero">
+        <div class="money-amount" id="p-lost">0€</div>
+        <div class="money-label">estimado en oportunidades perdidas / mes</div>
+      </div>
+      <div class="money-breakdown" id="p-money-breakdown">
+        <!-- generado por JS -->
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);text-align:center;margin-top:12px">*Estimación basada en datos del sector y tráfico medio de negocios similares</div>
+    </div>
+  </div>
+
+  <!-- S5: LA SOLUCIÓN -->
+  <div class="slide" id="s5">
+    <div class="s-wrap">
+      <div class="s-badge">✅ La solución</div>
+      <div class="s-title">WhiteMoon instala<br>tu <span class="grad">agente IA</span></div>
+      <div class="s-sub">Operativo en 48 horas. Sin que tengas que hacer nada técnico.</div>
+      <div id="p-solutions"><!-- generado por JS --></div>
+    </div>
+  </div>
+
+  <!-- S6: ROI -->
+  <div class="slide" id="s6">
+    <div class="s-wrap">
+      <div class="s-badge">📈 Retorno de inversión</div>
+      <div class="s-title">Lo que ganas<br>con <span class="grad">WhiteMoon</span></div>
+      <div class="roi-vs">
+        <div class="roi-col">
+          <div class="roi-col-label">Sin IA</div>
+          <div class="roi-num red" id="roi-before">2%</div>
+          <div class="roi-num-label">conversión web</div>
+        </div>
+        <div class="vs-circle">VS</div>
+        <div class="roi-col after">
+          <div class="roi-col-label">Con WhiteMoon</div>
+          <div class="roi-num green" id="roi-after">9%</div>
+          <div class="roi-num-label">conversión web</div>
+        </div>
+      </div>
+      <div class="roi-payback">
+        <div class="roi-payback-num" id="roi-payback">2 meses</div>
+        <div class="roi-payback-label">para recuperar la inversión</div>
+      </div>
+      <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px">
+        <div style="font-size:.68rem;color:var(--text2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.08em">Qué significa en euros</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="roi-euros">
+          <!-- generado por JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7: ANTES / DESPUÉS -->
+  <div class="slide" id="s7">
+    <div class="s-wrap">
+      <div class="s-badge">⚡ Transformación</div>
+      <div class="s-title">Antes y después<br>de <span class="grad">WhiteMoon</span></div>
+      <div class="ab-header">
+        <div class="ab-label before">✗ Sin IA</div>
+        <div class="ab-label after">✓ Con WhiteMoon</div>
+      </div>
+      <div class="ab-container" id="p-ab">
+        <!-- generado por JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- S8: CASOS DE ÉXITO -->
+  <div class="slide" id="s8">
+    <div class="s-wrap">
+      <div class="s-badge">⭐ Casos reales</div>
+      <div class="s-title">Negocios que ya<br>usan <span class="grad">WhiteMoon IA</span></div>
+      <div id="p-cases"><!-- generado por JS --></div>
+    </div>
+  </div>
+
+  <!-- S9: PRECIO -->
+  <div class="slide" id="s9">
+    <div class="s-wrap">
+      <div class="s-badge">💎 Tu plan recomendado</div>
+      <div class="s-title">Empieza hoy<br>por <span class="grad" id="p-price-title">149€/mes</span></div>
+      <div class="price-card" id="p-price-card">
+        <!-- generado por JS -->
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:.76rem;color:var(--text2);line-height:1.6">
+        <b style="color:var(--text)">¿Qué pasa si no me gusta?</b><br>
+        Sin permanencia. Cancelas cuando quieras. Sin letra pequeña. Sin penalizaciones.
+      </div>
+    </div>
+  </div>
+
+  <!-- S10: CIERRE -->
+  <div class="slide" id="s10">
+    <div class="s-wrap" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
+      <span class="close-emoji">🚀</span>
+      <div class="s-badge">Siguiente paso</div>
+      <div class="s-title">Empezamos<br><span class="grad">esta semana</span></div>
+      <div class="s-sub">En 48 horas tu chatbot IA está activo y captando clientes.</div>
+      <div class="close-steps">
+        <div class="close-step">
+          <div class="step-num">1</div>
+          <div class="step-text"><b>Hoy</b> — Confirmamos el pack y firmamos</div>
+        </div>
+        <div class="close-step">
+          <div class="step-num">2</div>
+          <div class="step-text"><b>Mañana</b> — Configuramos tu agente IA personalizado</div>
+        </div>
+        <div class="close-step">
+          <div class="step-num">3</div>
+          <div class="step-text"><b>En 48h</b> — Tu chatbot está online capturando leads</div>
+        </div>
+      </div>
+      <a class="close-wa" id="p-wa-btn" href="#" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.123.556 4.112 1.528 5.837L.057 23.215c-.073.266.173.512.44.44l5.42-1.463A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.368l-.36-.214-3.716 1.003 1.02-3.617-.235-.373A9.818 9.818 0 0112 2.182c5.426 0 9.818 4.392 9.818 9.818 0 5.427-4.392 9.818-9.818 9.818z"/></svg>
+        Empezar ahora por WhatsApp
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div class="slide-nav" id="slide-nav" style="display:none">
+  <button class="nav-btn btn-prev" onclick="prevSlide()">← Atrás</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+    <div class="nav-dots" id="nav-dots"></div>
+    <div class="slide-counter" id="slide-counter">1 / 10</div>
+  </div>
+  <button class="nav-btn btn-next" onclick="nextSlide()">Siguiente →</button>
+</div>
+
+<script>
+var BIZ='', CONTACT='', SECTOR='', SCORE_SIT='';
+var currentSlide=0, totalSlides=10;
+var WA_NUM='34643199580';
+
+// SECTOR DATA
+var SECTOR_DATA={
+  dental:{
+    name:'Clínica Dental',ico:'🦷',
+    ticket:280,visits:800,
+    problems:[
+      {ico:'phone',text:'Llamadas perdidas fuera de horario',cost:'~8 pacientes/mes perdidos'},
+      {ico:'calendar',text:'Sin sistema de citas online 24/7',cost:'30% de leads se van a la competencia'},
+      {ico:'chat',text:'Sin chatbot — nadie responde de noche',cost:'Urgencias sin atender = paciente perdido para siempre'},
+      {ico:'star',text:'Sin gestión automatizada de reseñas',cost:'Tu reputación online no crece'}
+    ],
+    cases:[
+      {ico:'🦷',name:'Clínica Dental Sur',loc:'Sevilla',stats:['+42%','8 min','4.9★'],labels:['más citas','respuesta','en Google'],quote:'"El chatbot agenda mientras dormimos. Increíble."'}
+    ],
+    abItems:[
+      ['Teléfono sin atender de noche','Chatbot IA atiende 24/7'],
+      ['Paciente espera y llama a otro','Responde en segundos'],
+      ['Sin recordatorio de citas','WhatsApp automático -60% no-shows'],
+      ['Sin reseñas gestionadas','Solicita reseñas automáticamente']
+    ]
+  },
+  restaurante:{
+    name:'Restaurante',ico:'🍽️',
+    ticket:35,visits:600,
+    problems:[
+      {ico:'phone',text:'Reservas perdidas cuando estáis en servicio',cost:'~15 reservas/mes perdidas'},
+      {ico:'cart',text:'Sin pedidos online ni takeaway digital',cost:'Canal de ingresos extra desaprovechado'},
+      {ico:'chat',text:'WhatsApp sin respuesta automática',cost:'Cliente sin respuesta = cliente perdido'},
+      {ico:'star',text:'Sin gestión de reseñas Google',cost:'Competencia con más reseñas gana clientes'}
+    ],
+    cases:[
+      {ico:'🍽️',name:'Restaurante La Bodega',loc:'Valencia',stats:['+38%','2 min','4.8★'],labels:['más reservas','respuesta','en Google'],quote:'"Las reservas de noche ahora se gestionan solas."'}
+    ],
+    abItems:[
+      ['Reservas solo por teléfono','Reservas 24/7 por WhatsApp/web'],
+      ['Sin pedidos takeaway digital','Sistema de pedidos con carta online'],
+      ['Sin recordatorio de reserva','Confirmación automática anti no-show'],
+      ['Carta solo en papel','Carta digital con fotos y precios']
+    ]
+  },
+  belleza:{
+    name:'Centro de Estética',ico:'💅',
+    ticket:65,visits:500,
+    problems:[
+      {ico:'calendar',text:'Citas solo por teléfono o presencial',cost:'~12 citas/mes perdidas'},
+      {ico:'phone',text:'No-shows sin recordatorio previo',cost:'20% de citas no se presentan'},
+      {ico:'chat',text:'Sin chatbot de consulta de tratamientos',cost:'Clientas van a la competencia que sí responde'},
+      {ico:'star',text:'Sin captación automática de nuevas clientas',cost:'Crecimiento solo por boca a boca'}
+    ],
+    cases:[
+      {ico:'💅',name:'Centro Belleza Lumière',loc:'Madrid',stats:['+51%','5 min','4.9★'],labels:['más citas','respuesta','en Google'],quote:'"Los no-shows bajaron un 65% con los recordatorios."'}
+    ],
+    abItems:[
+      ['Citas solo en horario de trabajo','Reservas online 24/7'],
+      ['No-shows frecuentes','Recordatorio automático -65% faltas'],
+      ['Sin información de tratamientos 24h','Chatbot informa y asesora siempre'],
+      ['Captación solo presencial','Leads digitales automáticos']
+    ]
+  },
+  peluqueria:{
+    name:'Peluquería',ico:'✂️',
+    ticket:45,visits:400,
+    problems:[
+      {ico:'calendar',text:'Agenda llena de llamadas para reservar',cost:'Tiempo perdido en llamadas innecesarias'},
+      {ico:'phone',text:'No-shows sin avisar',cost:'~8 huecos vacíos/semana'},
+      {ico:'chat',text:'Sin presencia activa en redes',cost:'Nuevas clientas no te encuentran'},
+      {ico:'star',text:'Sin fidelización digital',cost:'Clientas que no repiten'}
+    ],
+    cases:[
+      {ico:'✂️',name:'Peluquería Glamour',loc:'Barcelona',stats:['+44%','3 min','4.8★'],labels:['más citas','respuesta','en Google'],quote:'"Ahora las chicas reservan a las 11 de la noche."'}
+    ],
+    abItems:[
+      ['Reservas solo por llamada','Reservas por WhatsApp/web 24h'],
+      ['No-shows sin control','Recordatorio 24h antes -60% faltas'],
+      ['Sin galería de trabajos digital','Portfolio online con antes/después'],
+      ['Sin programa de fidelización','Bono automático para clientas frecuentes']
+    ]
+  },
+  abogado:{
+    name:'Despacho de Abogados',ico:'⚖️',
+    ticket:600,visits:300,
+    problems:[
+      {ico:'phone',text:'Consultas urgentes sin atender fuera de horario',cost:'Cliente urgente llama al siguiente de la lista'},
+      {ico:'chat',text:'Sin cualificación automática de leads',cost:'Tiempo perdido en consultas no rentables'},
+      {ico:'calendar',text:'Sin agenda online de consultas',cost:'Proceso de captación largo y manual'},
+      {ico:'star',text:'Sin presencia digital activa',cost:'Clientes te buscan y no te encuentran'}
+    ],
+    cases:[
+      {ico:'⚖️',name:'Bufete García & Asociados',loc:'Madrid',stats:['+67%','8 min','4.9★'],labels:['más consultas','respuesta','en Google'],quote:'"El chatbot cualifica los casos antes de que los veamos."'}
+    ],
+    abItems:[
+      ['Consultas urgentes sin atender','Chatbot atiende y recoge datos 24/7'],
+      ['Leads sin cualificar','Cualificación automática por tipo de caso'],
+      ['Agenda manual por teléfono','Citas online con confirmación automática'],
+      ['Sin contenido digital','Blog y FAQ automático posicionamiento SEO']
+    ]
+  },
+  gestoria:{
+    name:'Gestoría / Asesoría',ico:'📊',
+    ticket:200,visits:350,
+    problems:[
+      {ico:'phone',text:'Consultas básicas que ocupan tiempo del equipo',cost:'3h/día en consultas que podría resolver IA'},
+      {ico:'chat',text:'Sin captación de nuevos autónomos/empresas',cost:'Competencia con web + chatbot capta tus clientes'},
+      {ico:'calendar',text:'Sin gestión digital de documentos',cost:'Clientes llaman para saber estados de trámites'},
+      {ico:'star',text:'Sin recordatorios de obligaciones fiscales',cost:'Clientes insatisfechos por falta de proactividad'}
+    ],
+    cases:[
+      {ico:'📊',name:'Gestoría Martínez',loc:'Zaragoza',stats:['+38%','5 min','4.8★'],labels:['nuevos clientes','respuesta','en Google'],quote:'"El chatbot responde las dudas básicas y nosotros nos centramos en lo importante."'}
+    ],
+    abItems:[
+      ['Consultas básicas ocupan al equipo','Chatbot resuelve dudas frecuentes 24/7'],
+      ['Captación solo por recomendación','Formularios inteligentes en web'],
+      ['Clientes llaman por estado trámites','Notificaciones automáticas por WhatsApp'],
+      ['Sin recordatorios fiscales proactivos','Alertas automáticas de plazos importantes']
+    ]
+  },
+  taller:{
+    name:'Taller Mecánico',ico:'🚗',
+    ticket:180,visits:400,
+    problems:[
+      {ico:'phone',text:'Llamadas perdidas cuando estás en el foso',cost:'~10 clientes/mes van a la competencia'},
+      {ico:'calendar',text:'Sin citas online — todo por teléfono',cost:'Clientes no encuentran hueco y se van'},
+      {ico:'chat',text:'Sin recordatorio de revisiones y ITV',cost:'Clientes que no vuelven por olvido'},
+      {ico:'star',text:'Sin presupuesto online automático',cost:'Clientes que preguntan precio y no vuelven'}
+    ],
+    cases:[
+      {ico:'🚗',name:'Taller Mecánico García',loc:'Bilbao',stats:['+45%','4 min','4.7★'],labels:['más citas','respuesta','en Google'],quote:'"Los recordatorios de ITV han disparado las revisiones."'}
+    ],
+    abItems:[
+      ['Teléfono sin respuesta en horario','Chatbot atiende y agenda 24/7'],
+      ['Sin citas online','Sistema de citas digital con confirmación'],
+      ['Sin recordatorios de mantenimiento','Alertas automáticas ITV/revisiones'],
+      ['Presupuesto solo presencial','Presupuesto orientativo online']
+    ]
+  },
+  veterinaria:{
+    name:'Clínica Veterinaria',ico:'🐾',
+    ticket:95,visits:500,
+    problems:[
+      {ico:'phone',text:'Urgencias nocturnas sin atender',cost:'Mascota enferma = dueño desesperado que busca otro'},
+      {ico:'calendar',text:'Sin recordatorio de vacunas y revisiones',cost:'~25% de pacientes no vuelven por olvido'},
+      {ico:'chat',text:'Sin triaje automático de urgencias',cost:'Llamadas innecesarias saturan la clínica'},
+      {ico:'star',text:'Sin captación digital de nuevos pacientes',cost:'Solo crecen por boca a boca'}
+    ],
+    cases:[
+      {ico:'🐾',name:'Clínica Veterinaria Mar',loc:'Alicante',stats:['+52%','3 min','4.9★'],labels:['más consultas','respuesta','en Google'],quote:'"El recordatorio de vacunas ha disparado las consultas."'}
+    ],
+    abItems:[
+      ['Urgencias nocturnas sin respuesta','Chatbot atiende y orienta 24/7'],
+      ['Sin recordatorio de vacunas','Alertas automáticas calendario sanitario'],
+      ['Triaje manual por teléfono','Triaje automático por síntomas'],
+      ['Captación solo presencial','Formulario de nueva mascota online']
+    ]
+  },
+  otro:{
+    name:'Negocio local',ico:'🏪',
+    ticket:150,visits:400,
+    problems:[
+      {ico:'phone',text:'Clientes sin respuesta fuera de horario',cost:'~15 leads/mes perdidos'},
+      {ico:'chat',text:'Sin chatbot en la web',cost:'Visitantes se van sin dejar datos'},
+      {ico:'calendar',text:'Sin sistema de citas o reservas online',cost:'Proceso de compra largo = menos ventas'},
+      {ico:'star',text:'Sin automatización de seguimiento',cost:'Leads que se enfrían sin nurturing'}
+    ],
+    cases:[
+      {ico:'🏪',name:'Negocio Local XYZ',loc:'España',stats:['+40%','5 min','4.8★'],labels:['más leads','respuesta','en Google'],quote:'"WhiteMoon transformó nuestra captación digital."'}
+    ],
+    abItems:[
+      ['Sin respuesta fuera de horario','Chatbot atiende 24h los 365 días'],
+      ['Visitantes web sin convertir','Captura automática de leads'],
+      ['Sin reservas online','Sistema de citas digital'],
+      ['Sin seguimiento automático','Nurturing por WhatsApp automático']
+    ]
+  }
+};
+
+var svgIcons={
+  phone:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
+  cart:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+};
+
+function startPresentation(){
+  BIZ = document.getElementById('s-biz').value.trim() || 'Tu negocio';
+  CONTACT = document.getElementById('s-contact').value.trim();
+  SECTOR = document.getElementById('s-sector').value || 'otro';
+  SCORE_SIT = document.getElementById('s-score').value || 'sin-chatbot';
+
+  if(!document.getElementById('s-sector').value){
+    alert('Por favor selecciona el sector del negocio');
+    return;
+  }
+
+  buildSlides();
+  document.getElementById('setup').style.display='none';
+  document.getElementById('slides').style.display='block';
+  document.getElementById('slide-nav').style.display='flex';
+  buildDots();
+  goToSlide(0);
+}
+
+function buildSlides(){
+  var d = SECTOR_DATA[SECTOR] || SECTOR_DATA.otro;
+  var score = SCORE_SIT==='todo-mal'?22:SCORE_SIT==='sin-web'?35:SCORE_SIT==='sin-chatbot'?48:55;
+  var lost = Math.round(d.ticket * d.visits * 0.02 * (1-(score/100)) * 3);
+  var lostFmt = lost.toLocaleString('es-ES')+'€';
+
+  // S1
+  document.getElementById('p-biz-1').textContent = BIZ;
+  document.getElementById('p-sector-1').textContent = d.ico+' '+d.name;
+
+  // S2 - Diagnóstico
+  document.getElementById('p-score').textContent = score+'%';
+  document.getElementById('p-score').style.color = score<40?'#ef4444':score<60?'#f97316':'#22c55e';
+  var bar = document.getElementById('p-score-bar');
+  setTimeout(function(){
+    bar.style.width=score+'%';
+    bar.style.background=score<40?'linear-gradient(90deg,#ef4444,#f97316)':score<60?'linear-gradient(90deg,#f97316,#eab308)':'linear-gradient(90deg,#22c55e,#16a34a)';
+  },600);
+
+  var diagItems=[
+    {ico:'💬',label:'Chatbot IA',val:SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-chatbot'?'Sin chatbot':'Básico',bad:SCORE_SIT!=='todo-bien'},
+    {ico:'📱',label:'WhatsApp Business',val:SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-wa'?'No activo':'Activo',bad:SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-wa'},
+    {ico:'🔍',label:'SEO Local',val:score<50?'Mejorable':'Correcto',bad:score<50},
+    {ico:'📅',label:'Reservas Online',val:SCORE_SIT==='todo-mal'?'Sin sistema':'Manual',bad:true}
+  ];
+  var dg=document.getElementById('p-diag-grid');
+  dg.innerHTML=diagItems.map(function(i){
+    return'<div class="diag-card '+(i.bad?'bad':'good')+'">'+
+      '<div class="diag-ico">'+i.ico+'</div>'+
+      '<div class="diag-label">'+i.label+'</div>'+
+      '<div class="diag-val '+(i.bad?'red':'green')+'">'+i.val+'</div>'+
+    '</div>';
+  }).join('');
+
+  // S3 - Problemas
+  if(CONTACT) document.getElementById('p-contact-greeting').textContent=
+    CONTACT+', te lo mostramos con datos reales del sector '+d.name.toLowerCase()+':';
+
+  document.getElementById('p-problems').innerHTML=d.problems.map(function(p){
+    return'<div class="problem-item">'+
+      '<div class="prob-ico"><svg viewBox="0 0 24 24">'+svgIcons[p.ico]+'</svg></div>'+
+      '<div><div class="prob-text">'+p.text+'</div>'+
+      '<div class="prob-cost">'+p.cost+'</div></div>'+
+    '</div>';
+  }).join('');
+
+  // S4 - Dinero perdido
+  document.getElementById('p-lost').textContent = lostFmt;
+  var breakdownItems=[
+    {num:Math.round(lost*0.4).toLocaleString('es-ES')+'€',label:'Leads perdidos fuera de horario'},
+    {num:Math.round(lost*0.3).toLocaleString('es-ES')+'€',label:'Citas/reservas sin confirmar'},
+    {num:Math.round(lost*0.2).toLocaleString('es-ES')+'€',label:'Clientes que no repiten'},
+    {num:Math.round(lost*0.1).toLocaleString('es-ES')+'€',label:'Oportunidades sin seguimiento'}
+  ];
+  document.getElementById('p-money-breakdown').innerHTML=breakdownItems.map(function(i){
+    return'<div class="money-item">'+
+      '<div class="money-item-num">'+i.num+'</div>'+
+      '<div class="money-item-label">'+i.label+'</div>'+
+    '</div>';
+  }).join('');
+
+  // S5 - Soluciones
+  var sols=[
+    {ico:'chat',title:'Chatbot IA 24/7',price:'Pack Advance — 149€/mes',feats:['Responde consultas automáticamente','Captura leads mientras duermes','Agenda citas sin intervención humana','Integración WhatsApp Business']},
+    {ico:'calendar',title:'Web Profesional + IA',price:'Pack Pyme — 1.800€ único',feats:['Web nueva con chatbot integrado','Sistema de reservas online','SEO optimizado desde el día 1','Operativo en 5-7 días']}
+  ];
+  document.getElementById('p-solutions').innerHTML=sols.map(function(s){
+    return'<div class="solution-card">'+
+      '<div class="sol-header">'+
+        '<div class="sol-ico"><svg viewBox="0 0 24 24">'+svgIcons[s.ico]+'</svg></div>'+
+        '<div><div class="sol-title">'+s.title+'</div>'+
+        '<div class="sol-price">'+s.price+'</div></div>'+
+      '</div>'+
+      '<div class="sol-features">'+s.feats.map(function(f){
+        return'<div class="sol-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f+'</div>';
+      }).join('')+'</div>'+
+    '</div>';
+  }).join('');
+
+  // S6 - ROI
+  var beforeConv=2,afterConv=9;
+  var leadsMonth=Math.round(d.visits*0.002*30);
+  var revenueAfter=Math.round(leadsMonth*(afterConv/100)*d.ticket);
+  document.getElementById('roi-payback').textContent=SCORE_SIT==='todo-mal'?'3 meses':'2 meses';
+  document.getElementById('roi-euros').innerHTML=
+    '<div class="money-item"><div class="money-item-num" style="color:#ef4444">'+
+    Math.round(leadsMonth*(beforeConv/100)*d.ticket).toLocaleString('es-ES')+'€</div>'+
+    '<div class="money-item-label">ingresos/mes actuales estimados</div></div>'+
+    '<div class="money-item"><div class="money-item-num" style="color:#22c55e">'+
+    revenueAfter.toLocaleString('es-ES')+'€</div>'+
+    '<div class="money-item-label">ingresos/mes con WhiteMoon</div></div>';
+
+  // S7 - Antes/Después
+  document.getElementById('p-ab').innerHTML=d.abItems.map(function(item){
+    return'<div class="ab-row">'+
+      '<div class="ab-item bad"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'+item[0]+'</div>'+
+      '<div class="ab-item good"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+item[1]+'</div>'+
+    '</div>';
+  }).join('');
+
+  // S8 - Casos
+  document.getElementById('p-cases').innerHTML=d.cases.map(function(c){
+    return'<div class="case-card">'+
+      '<div class="case-header">'+
+        '<div class="case-avatar" style="background:rgba(139,92,246,.1)">'+c.ico+'</div>'+
+        '<div><div class="case-biz">'+c.name+'</div>'+
+        '<div class="case-sector">'+c.loc+' · '+d.name+'</div></div>'+
+      '</div>'+
+      '<div class="case-stats">'+c.stats.map(function(s,i){
+        return'<div class="case-stat">'+
+          '<div class="case-stat-num">'+s+'</div>'+
+          '<div class="case-stat-label">'+c.labels[i]+'</div>'+
+        '</div>';
+      }).join('')+'</div>'+
+      '<div class="case-quote">'+c.quote+'</div>'+
+    '</div>';
+  }).join('');
+
+  // S9 - Precio
+  var isLarge=SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-web';
+  var planName=isLarge?'Pack Pyme':'Pack Advance';
+  var planPrice=isLarge?'1.800€':'149€';
+  var planPeriod=isLarge?'pago único':'mes';
+  var planSetup=isLarge?'Incluye web + dominio + chatbot + reservas':'+ 299€ setup · Sin permanencia';
+  var planFeats=isLarge?
+    ['Web profesional completa','Dominio incluido 1 año','Chatbot IA personalizado','Sistema de reservas online','SEO optimizado','Operativo en 5-7 días']:
+    ['Chatbot IA conversacional 24/7','Captura leads automática','Integración WhatsApp Business','Dashboard de conversaciones','Activación en 48h','Sin permanencia'];
+
+  document.getElementById('p-price-title').textContent=planPrice+(isLarge?'':'/mes');
+  document.getElementById('p-price-card').innerHTML=
+    '<div class="price-tag">⭐ RECOMENDADO PARA '+BIZ.toUpperCase()+'</div>'+
+    '<div class="price-name">'+planName+'</div>'+
+    '<div class="price-amount">'+planPrice+'<span>/'+planPeriod+'</span></div>'+
+    '<div class="price-setup">'+planSetup+'</div>'+
+    '<div class="price-features">'+planFeats.map(function(f){
+      return'<div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f+'</div>';
+    }).join('')+'</div>'+
+    '<a class="price-cta" href="https://wa.me/'+WA_NUM+'?text=Hola%2C+me+interesa+el+'+
+    encodeURIComponent(planName)+'+para+'+encodeURIComponent(BIZ)+'" target="_blank">'+
+    'Contratar '+planName+' →</a>';
+
+  // S10 - WA
+  document.getElementById('p-wa-btn').href=
+    'https://wa.me/'+WA_NUM+'?text=Hola%2C+acabo+de+ver+la+presentaci%C3%B3n+de+WhiteMoon+para+'+
+    encodeURIComponent(BIZ)+'.+Quiero+empezar+esta+semana.';
+}
+
+// NAVIGATION
+function buildDots(){
+  var c=document.getElementById('nav-dots');
+  c.innerHTML='';
+  for(var i=0;i<totalSlides;i++){
+    var d=document.createElement('div');
+    d.className='dot'+(i===0?' active':'');
+    d.onclick=(function(idx){return function(){goToSlide(idx)}})(i);
+    c.appendChild(d);
+  }
+}
+
+function updateDots(){
+  var dots=document.querySelectorAll('.dot');
+  dots.forEach(function(d,i){
+    d.classList.toggle('active',i===currentSlide);
+  });
+  document.getElementById('slide-counter').textContent=(currentSlide+1)+' / '+totalSlides;
+  var prevBtn=document.querySelector('.btn-prev');
+  var nextBtn=document.querySelector('.btn-next');
+  if(prevBtn) prevBtn.style.opacity=currentSlide===0?'0.3':'1';
+  if(nextBtn) nextBtn.textContent=currentSlide===totalSlides-1?'Cerrar ✕':'Siguiente →';
+}
+
+function goToSlide(n){
+  var slides=document.querySelectorAll('.slide');
+  slides.forEach(function(s,i){
+    s.classList.remove('active','prev');
+    if(i<n) s.classList.add('prev');
+  });
+  slides[n].classList.add('active');
+  currentSlide=n;
+  updateDots();
+}
+
+function nextSlide(){
+  if(currentSlide<totalSlides-1) goToSlide(currentSlide+1);
+  else{document.getElementById('slides').style.display='none';document.getElementById('slide-nav').style.display='none';document.getElementById('setup').style.display='flex';}
+}
+
+function prevSlide(){
+  if(currentSlide>0) goToSlide(currentSlide-1);
+}
+
+// SWIPE
+var touchX=0;
+document.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX});
+document.addEventListener('touchend',function(e){
+  var diff=touchX-e.changedTouches[0].clientX;
+  if(Math.abs(diff)>50){if(diff>0)nextSlide();else prevSlide();}
+});
+
+// KEYBOARD
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') nextSlide();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
+});
+</script>
+</body>
+</html>
