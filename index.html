@@ -30,10 +30,31 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .setup-btn{padding:15px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .2s}
 .setup-btn:active{transform:scale(.97)}
 .setup-note{font-size:.7rem;color:var(--muted);margin-top:8px}
+.field-group{display:flex;flex-direction:column;gap:6px;text-align:left}
+.field-group label{font-size:.7rem;font-weight:600;color:var(--text2);letter-spacing:.04em;padding-left:2px}
+.field-group .setup-input,.field-group .setup-select{margin:0}
+.field-note{font-size:.65rem;color:var(--muted);padding-left:2px}
 
 /* ── SLIDES ── */
 #slides{position:fixed;inset:0;display:none}
-.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;transform:translateX(60px)}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;transform:translateX(60px);overflow:hidden}
+.slide-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+.slide-bg-img.dim-strong{filter:brightness(.25) saturate(.8)}
+.slide-bg-img.dim-extreme{filter:brightness(.15) saturate(.5)}
+.slide-bg-img+.s-wrap{position:relative;z-index:1}
+.slide-img{width:100%;object-fit:cover;border-radius:14px;margin-bottom:16px;display:block;background:var(--bg2)}
+.slide-img.problem{height:160px;filter:brightness(.7) saturate(.8)}
+.slide-img.team{height:140px;filter:brightness(.6) saturate(.7)}
+.team-frame{position:relative;border-radius:14px;overflow:hidden;margin-bottom:16px}
+.team-frame .slide-img{margin-bottom:0;border-radius:0}
+.team-frame .team-overlay{position:absolute;left:14px;bottom:12px;right:14px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:#fff;letter-spacing:-.01em;text-shadow:0 2px 12px rgba(0,0,0,.6);z-index:1}
+.case-card{position:relative;overflow:hidden}
+.case-img{width:calc(100% + 36px);height:100px;object-fit:cover;display:block;border-radius:10px 10px 0 0;filter:brightness(.6);margin:-18px -18px 14px}
+@media (max-width:380px){
+  .slide-img.problem{height:120px}
+  .slide-img.team{height:120px}
+  .case-img{height:80px}
+}
 .slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
 .slide.prev{opacity:0;transform:translateX(-60px)}
 
@@ -227,6 +248,29 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
       <option value="sin-wa">Sin WhatsApp Business</option>
       <option value="todo-mal">Sin web, sin chatbot, sin WA</option>
     </select>
+    <div class="field-group">
+      <label>Visitas web/mes (aproximado)</label>
+      <select class="setup-select" id="s-visits">
+        <option value="200">Menos de 200 visitas</option>
+        <option value="500" selected>200-500 visitas</option>
+        <option value="1000">500-1.000 visitas</option>
+        <option value="2000">Más de 1.000 visitas</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Ticket medio por cliente (€)</label>
+      <input class="setup-input" type="number" id="s-ticket" placeholder="Ej: 150" min="10" max="5000">
+      <div class="field-note">Cuánto gasta de media cada cliente</div>
+    </div>
+    <div class="field-group">
+      <label>Llamadas/consultas perdidas por semana</label>
+      <select class="setup-select" id="s-calls">
+        <option value="3">1-5 llamadas</option>
+        <option value="10" selected>5-15 llamadas</option>
+        <option value="20">15-30 llamadas</option>
+        <option value="40">Más de 30 llamadas</option>
+      </select>
+    </div>
     <button class="setup-btn" onclick="startPresentation()">
       ⚡ Iniciar presentación
     </button>
@@ -239,6 +283,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
   <!-- S1: PORTADA -->
   <div class="slide" id="s1">
+    <img id="p-hero-1" class="slide-bg-img dim-strong" loading="lazy" alt="">
     <div class="s-wrap" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
       <div class="s1-logo">
         <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -272,6 +317,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <!-- S3: EL PROBLEMA -->
   <div class="slide" id="s3">
     <div class="s-wrap">
+      <img id="p-problem-img" class="slide-img problem" loading="lazy" alt="">
       <div class="s-badge">⚠️ El problema</div>
       <div class="s-title">Lo que te está<br>costando <span class="grad">dinero</span></div>
       <div class="s-sub" id="p-contact-greeting">Cada día sin IA digital, pierdes clientes que van a tu competencia.</div>
@@ -300,6 +346,10 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <!-- S5: LA SOLUCIÓN -->
   <div class="slide" id="s5">
     <div class="s-wrap">
+      <div class="team-frame">
+        <img id="p-team-img" class="slide-img team" loading="lazy" alt="">
+        <div class="team-overlay">Tu negocio con WhiteMoon IA</div>
+      </div>
       <div class="s-badge">✅ La solución</div>
       <div class="s-title">WhiteMoon instala<br>tu <span class="grad">agente IA</span></div>
       <div class="s-sub">Operativo en 48 horas. Sin que tengas que hacer nada técnico.</div>
@@ -379,6 +429,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 
   <!-- S10: CIERRE -->
   <div class="slide" id="s10">
+    <img id="p-hero-10" class="slide-bg-img dim-extreme" loading="lazy" alt="">
     <div class="s-wrap" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
       <span class="close-emoji">🚀</span>
       <div class="s-badge">Siguiente paso</div>
@@ -597,6 +648,69 @@ var SECTOR_DATA={
   }
 };
 
+var SECTOR_IMAGES={
+  dental:{
+    hero:'https://images.unsplash.com/photo-1588776814546-1ffbb34c94a4?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&q=70'
+  },
+  restaurante:{
+    hero:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&q=70'
+  },
+  belleza:{
+    hero:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=70'
+  },
+  peluqueria:{
+    hero:'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&q=70'
+  },
+  abogado:{
+    hero:'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=70'
+  },
+  gestoria:{
+    hero:'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=70'
+  },
+  taller:{
+    hero:'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1632823469850-2f77dd9c7f93?w=400&q=70'
+  },
+  veterinaria:{
+    hero:'https://images.unsplash.com/photo-1548767797-d8c844163c4a?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=70'
+  },
+  inmobiliaria:{
+    hero:'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&q=70'
+  },
+  academia:{
+    hero:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=70'
+  },
+  gimnasio:{
+    hero:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=70'
+  },
+  otro:{
+    hero:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=70',
+    team:'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=70',
+    problem:'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400&q=70'
+  }
+};
+
 var svgIcons={
   phone:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>',
   calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
@@ -626,13 +740,26 @@ function startPresentation(){
 
 function buildSlides(){
   var d = SECTOR_DATA[SECTOR] || SECTOR_DATA.otro;
+  var imgs = SECTOR_IMAGES[SECTOR] || SECTOR_IMAGES.otro;
   var score = SCORE_SIT==='todo-mal'?22:SCORE_SIT==='sin-web'?35:SCORE_SIT==='sin-chatbot'?48:55;
-  var lost = Math.round(d.ticket * d.visits * 0.02 * (1-(score/100)) * 3);
+
+  var visits = parseInt(document.getElementById('s-visits').value,10) || d.visits;
+  var ticket = parseInt(document.getElementById('s-ticket').value,10) || d.ticket;
+  var calls  = parseInt(document.getElementById('s-calls').value,10) || 10;
+
+  // datos reales: llamadas perdidas/mes × ticket × tasa conversión 30%
+  var lost = Math.round((calls * 4) * ticket * 0.3);
   var lostFmt = lost.toLocaleString('es-ES')+'€';
 
   // S1
   document.getElementById('p-biz-1').textContent = BIZ;
   document.getElementById('p-sector-1').textContent = d.ico+' '+d.name;
+  document.getElementById('p-hero-1').src = imgs.hero;
+
+  // Imágenes sectoriales
+  document.getElementById('p-problem-img').src = imgs.problem;
+  document.getElementById('p-team-img').src = imgs.team;
+  document.getElementById('p-hero-10').src = imgs.team;
 
   // S2 - Diagnóstico
   document.getElementById('p-score').textContent = score+'%';
@@ -705,12 +832,12 @@ function buildSlides(){
 
   // S6 - ROI
   var beforeConv=2,afterConv=9;
-  var leadsMonth=Math.round(d.visits*0.002*30);
-  var revenueAfter=Math.round(leadsMonth*(afterConv/100)*d.ticket);
+  var leadsMonth=Math.round(visits*0.002*30);
+  var revenueAfter=Math.round(leadsMonth*(afterConv/100)*ticket);
   document.getElementById('roi-payback').textContent=SCORE_SIT==='todo-mal'?'3 meses':'2 meses';
   document.getElementById('roi-euros').innerHTML=
     '<div class="money-item"><div class="money-item-num" style="color:#ef4444">'+
-    Math.round(leadsMonth*(beforeConv/100)*d.ticket).toLocaleString('es-ES')+'€</div>'+
+    Math.round(leadsMonth*(beforeConv/100)*ticket).toLocaleString('es-ES')+'€</div>'+
     '<div class="money-item-label">ingresos/mes actuales estimados</div></div>'+
     '<div class="money-item"><div class="money-item-num" style="color:#22c55e">'+
     revenueAfter.toLocaleString('es-ES')+'€</div>'+
@@ -727,6 +854,7 @@ function buildSlides(){
   // S8 - Casos
   document.getElementById('p-cases').innerHTML=d.cases.map(function(c){
     return'<div class="case-card">'+
+      '<img class="case-img" loading="lazy" src="'+imgs.hero+'" alt="">'+
       '<div class="case-header">'+
         '<div class="case-avatar" style="background:rgba(139,92,246,.1)">'+c.ico+'</div>'+
         '<div><div class="case-biz">'+c.name+'</div>'+
