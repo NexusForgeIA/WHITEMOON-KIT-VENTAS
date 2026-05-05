@@ -3,1031 +3,825 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>WhiteMoon · Kit de Ventas</title>
+<title>WhiteMoon · Kit de Ventas IA</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --p:#8b5cf6;--p2:#7c3aed;--accent:#c084fc;
+  --p:#8b5cf6;--p2:#7c3aed;--accent:#c084fc;--accent2:#e879f9;
   --green:#22c55e;--green2:#86efac;
-  --orange:#f97316;--red:#ef4444;
-  --bg:#07070e;--bg1:#0a0a14;--bg2:#0d0d1a;
-  --card:#111120;--text:#f0effe;--text2:#9090b0;
-  --muted:#404060;--border:rgba(139,92,246,.15);
+  --red:#ef4444;--orange:#f97316;
+  --cyan:#00d4ff;--cyan2:#38bdf8;
+  --bg:#04040c;--bg2:#08081a;
+  --card:#0c0c1e;--text:#f0effe;--text2:#7070a0;
+  --muted:#202040;--border:rgba(139,92,246,.13);
 }
-html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;user-select:none}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;user-select:none;-webkit-font-smoothing:antialiased}
 
-/* ── SETUP SCREEN ── */
-#setup{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
-.setup-logo{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px}
-.setup-logo span{color:var(--accent)}
-.setup-sub{font-size:.82rem;color:var(--text2);margin-bottom:32px}
-.setup-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
-.setup-input{padding:13px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border .2s}
-.setup-input:focus{border-color:var(--p)}
-.setup-input::placeholder{color:var(--muted)}
-.setup-select{padding:13px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;appearance:none;cursor:pointer}
-.setup-btn{padding:15px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .2s}
-.setup-btn:active{transform:scale(.97)}
-.setup-note{font-size:.7rem;color:var(--muted);margin-top:8px}
-.field-group{display:flex;flex-direction:column;gap:6px;text-align:left}
-.field-group label{font-size:.7rem;font-weight:600;color:var(--text2);letter-spacing:.04em;padding-left:2px}
-.field-group .setup-input,.field-group .setup-select{margin:0}
-.field-note{font-size:.65rem;color:var(--muted);padding-left:2px}
+/* ═══ GLOBAL BG ═══ */
+.gbg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.gbg-grid{position:absolute;inset:-50%;width:200%;height:200%;
+  background-image:linear-gradient(rgba(139,92,246,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(139,92,246,.055) 1px,transparent 1px);
+  background-size:48px 48px;
+  animation:gridDrift 25s linear infinite}
+@keyframes gridDrift{to{transform:translate(48px,48px)}}
+.gbg-o1{position:absolute;top:-20%;left:-15%;width:60%;height:60%;
+  background:radial-gradient(circle,rgba(124,58,237,.2) 0%,transparent 65%);
+  animation:oFloat 9s ease-in-out infinite}
+.gbg-o2{position:absolute;bottom:-20%;right:-15%;width:55%;height:55%;
+  background:radial-gradient(circle,rgba(0,212,255,.1) 0%,transparent 65%);
+  animation:oFloat 9s ease-in-out infinite 3.5s}
+.gbg-o3{position:absolute;top:35%;left:35%;width:35%;height:35%;
+  background:radial-gradient(circle,rgba(232,121,249,.08) 0%,transparent 65%);
+  animation:oFloat 7s ease-in-out infinite 1.5s}
+@keyframes oFloat{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.12) translate(12px,-12px)}}
+.gbg-scan{position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,.55),transparent);
+  animation:scanLine 7s linear infinite}
+@keyframes scanLine{0%{top:-1%;opacity:0}8%{opacity:1}92%{opacity:.3}100%{top:101%;opacity:0}}
 
-/* ── SLIDES ── */
+/* ═══ FLOATING CHIPS ═══ */
+.chip{position:fixed;background:rgba(10,10,28,.88);border:1px solid rgba(139,92,246,.28);
+  border-radius:10px;padding:9px 13px;font-family:'Space Mono',monospace;
+  backdrop-filter:blur(14px);z-index:5;transition:opacity .4s}
+.chip-val{font-size:.95rem;font-weight:700;color:#fff;line-height:1}
+.chip-label{font-size:.5rem;color:var(--text2);margin-top:2px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:4px}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes chipf1{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes chipf2{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes chipf3{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+/* ═══ TECH ELEMENTS ═══ */
+.tech-bar{height:2px;background:linear-gradient(90deg,var(--p),var(--accent),var(--cyan));
+  border-radius:1px;margin-bottom:18px;overflow:hidden;position:relative}
+.tech-bar::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);
+  animation:tbScan 2s linear infinite}
+@keyframes tbScan{to{left:140%}}
+
+.terminal{background:rgba(4,4,12,.92);border:1px solid rgba(139,92,246,.18);
+  border-radius:12px;padding:14px;font-family:'Space Mono',monospace;font-size:.64rem}
+.t-head{display:flex;align-items:center;gap:5px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px solid var(--border)}
+.td{width:9px;height:9px;border-radius:50%}
+.td1{background:#ff5f57}.td2{background:#ffbd2e}.td3{background:#28ca41}
+.t-title{color:var(--text2);margin-left:6px;font-size:.58rem}
+.tl{display:flex;gap:7px;margin-bottom:4px;line-height:1.5}
+.tl-prompt{color:var(--p);flex-shrink:0}
+.tl-ok{color:var(--green2)}.tl-err{color:var(--red)}.tl-warn{color:var(--orange)}
+.tl-val{color:#fff}.tl-dim{color:var(--text2)}
+
+/* ═══ SETUP ═══ */
+#setup{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.su-inner{width:100%;max-width:390px;position:relative;z-index:10}
+.su-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:5px}
+.su-ico{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--p),var(--p2));
+  display:flex;align-items:center;justify-content:center}
+.su-ico svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2}
+.su-name{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:900;color:#fff}
+.su-name span{color:var(--accent)}
+.su-tag{text-align:center;font-family:'Space Mono',monospace;font-size:.58rem;
+  color:var(--text2);margin-bottom:24px;letter-spacing:.06em}
+.su-card{background:rgba(10,10,26,.9);border:1px solid rgba(139,92,246,.2);
+  border-radius:18px;padding:22px;backdrop-filter:blur(20px)}
+.su-sec{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--p);margin-bottom:9px;margin-top:15px}
+.su-sec:first-child{margin-top:0}
+.su-in{width:100%;padding:11px 13px;background:rgba(6,6,20,.8);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.83rem;
+  outline:none;transition:border .2s;margin-bottom:7px}
+.su-in:focus{border-color:var(--p)}
+.su-in::placeholder{color:var(--muted)}
+.su-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.su-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--p),var(--p2));
+  border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;
+  font-size:.92rem;font-weight:800;cursor:pointer;margin-top:10px;
+  letter-spacing:.02em;transition:all .2s;position:relative;overflow:hidden}
+.su-btn::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);
+  opacity:0;transition:opacity .2s}
+.su-btn:hover::before{opacity:1}
+.su-btn:active{transform:scale(.97)}
+
+/* ═══ SLIDES ═══ */
 #slides{position:fixed;inset:0;display:none}
-.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s,transform .4s;transform:translateX(60px);overflow:hidden}
-.slide-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
-.slide-bg-img.dim-strong{filter:brightness(.25) saturate(.8)}
-.slide-bg-img.dim-extreme{filter:brightness(.15) saturate(.5)}
-.slide-bg-img+.s-wrap{position:relative;z-index:1}
-.slide-img{width:100%;object-fit:cover;border-radius:14px;margin-bottom:16px;display:block;background:var(--bg2)}
-.slide-img.problem{height:160px;filter:brightness(.7) saturate(.8)}
-.slide-img.team{height:140px;filter:brightness(.6) saturate(.7)}
-.team-frame{position:relative;border-radius:14px;overflow:hidden;margin-bottom:16px}
-.team-frame .slide-img{margin-bottom:0;border-radius:0}
-.team-frame .team-overlay{position:absolute;left:14px;bottom:12px;right:14px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:#fff;letter-spacing:-.01em;text-shadow:0 2px 12px rgba(0,0,0,.6);z-index:1}
-.case-card{position:relative;overflow:hidden}
-.case-img{width:calc(100% + 36px);height:100px;object-fit:cover;display:block;border-radius:10px 10px 0 0;filter:brightness(.6);margin:-18px -18px 14px}
-@media (max-width:380px){
-  .slide-img.problem{height:120px}
-  .slide-img.team{height:120px}
-  .case-img{height:80px}
-}
-.slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
-.slide.prev{opacity:0;transform:translateX(-60px)}
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;
+  transition:opacity .38s cubic-bezier(.4,0,.2,1),transform .38s cubic-bezier(.4,0,.2,1);
+  transform:translateX(36px) scale(.985)}
+.slide.active{opacity:1;pointer-events:all;transform:none}
+.slide.prev{opacity:0;transform:translateX(-36px) scale(.985)}
 
-/* ── NAV ── */
-.slide-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 20px 20px;background:linear-gradient(0deg,rgba(7,7,14,.98) 0%,transparent 100%);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.nav-dots{display:flex;gap:6px;align-items:center}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:all .3s;cursor:pointer}
-.dot.active{width:20px;border-radius:3px;background:var(--p)}
-.nav-btn{padding:10px 22px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s}
-.nav-btn:active{transform:scale(.95)}
-.btn-prev{background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
-.btn-next{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:10px 28px}
-.slide-counter{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted)}
+/* ═══ NAV ═══ */
+.snav{position:fixed;bottom:0;left:0;right:0;z-index:200;
+  padding:8px 16px 16px;
+  background:linear-gradient(0deg,rgba(4,4,12,1) 65%,transparent);
+  display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dots{display:flex;gap:5px;align-items:center}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--muted);transition:all .3s;cursor:pointer}
+.dot.active{width:18px;border-radius:3px;background:linear-gradient(90deg,var(--p),var(--accent))}
+.nb{padding:9px 20px;border-radius:10px;border:none;font-family:'Syne',sans-serif;
+  font-size:.77rem;font-weight:700;cursor:pointer;transition:all .2s}
+.nb:active{transform:scale(.95)}
+.np{background:rgba(12,12,30,.8);border:1px solid var(--border);color:var(--text2)}
+.nn{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:9px 24px}
+.sc{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text2)}
 
-/* ── SLIDE COMMON ── */
-.s-wrap{padding:24px 20px 100px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.s-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);border-radius:20px;font-size:.65rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
-.s-title{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,6vw,2.4rem);font-weight:900;line-height:1.05;letter-spacing:-.03em;color:#fff;margin-bottom:10px}
-.s-title .grad{background:linear-gradient(135deg,var(--accent),#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.s-sub{font-size:.85rem;color:var(--text2);line-height:1.65;margin-bottom:24px}
-.biz-name{color:var(--accent);font-weight:700}
+/* ═══ SLIDE CONTENT ═══ */
+.sw{padding:22px 18px 86px;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;z-index:10}
+.sbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;
+  background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);
+  border-radius:20px;font-size:.58rem;font-weight:700;color:var(--accent);
+  letter-spacing:.12em;text-transform:uppercase;margin-bottom:13px}
+.sbdot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
+.stitle{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,5.5vw,2.1rem);
+  font-weight:900;line-height:1.06;letter-spacing:-.03em;color:#fff;margin-bottom:8px}
+.grad{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grad-g{background:linear-gradient(135deg,var(--green),var(--green2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grad-c{background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ssub{font-size:.81rem;color:var(--text2);line-height:1.65;margin-bottom:18px}
 
-/* ── SLIDE 1: PORTADA ── */
-#s1{background:radial-gradient(ellipse at 30% 20%,rgba(124,58,237,.2) 0%,transparent 60%),var(--bg)}
-.s1-logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.s1-logo svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
-.s1-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,8vw,3.5rem);font-weight:900;line-height:1;letter-spacing:-.04em;color:#fff;margin-bottom:12px}
-.s1-sub{font-size:.9rem;color:var(--text2);line-height:1.6;margin-bottom:32px;max-width:320px}
-.s1-divider{width:40px;height:3px;background:linear-gradient(90deg,var(--p),var(--accent));border-radius:2px;margin-bottom:24px}
-.s1-biz{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent);margin-bottom:4px}
-.s1-sector{font-size:.78rem;color:var(--text2)}
-.s1-wm{position:absolute;bottom:100px;right:20px;font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted)}
+/* Cards */
+.acard{background:rgba(10,10,28,.85);border:1px solid var(--border);
+  border-radius:13px;padding:14px;margin-bottom:9px;
+  position:relative;overflow:hidden;transition:border-color .2s}
+.acard::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;border-radius:1px}
+.acard.red::after{background:var(--red)}
+.acard.grn::after{background:var(--green)}
+.acard.pur::after{background:var(--p)}
+.acard.cya::after{background:var(--cyan)}
+.acard-top{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.acard-ico{width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center}
+.acard-ico svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+.i-red{background:rgba(239,68,68,.1);color:#ef4444}
+.i-grn{background:rgba(34,197,94,.1);color:#22c55e}
+.i-pur{background:rgba(139,92,246,.1);color:var(--accent)}
+.i-cya{background:rgba(0,212,255,.1);color:var(--cyan)}
+.acard-title{font-size:.8rem;font-weight:600;color:#fff}
+.acard-sub{font-size:.7rem;color:var(--text2);line-height:1.5}
+.acard-tag{font-size:.6rem;font-family:'Space Mono',monospace;margin-top:5px}
+.acard-tag.err{color:var(--red)}.acard-tag.ok{color:var(--green)}
 
-/* ── SLIDE 2: DIAGNÓSTICO ── */
-.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.diag-card{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border)}
-.diag-card.bad{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)}
-.diag-card.good{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05)}
-.diag-ico{font-size:1.4rem;margin-bottom:6px}
-.diag-label{font-size:.68rem;font-weight:700;color:var(--text2);margin-bottom:2px;letter-spacing:.05em}
-.diag-val{font-size:.82rem;font-weight:600}
-.diag-val.red{color:#ef4444}.diag-val.green{color:#22c55e}.diag-val.orange{color:#f97316}
-.score-ring{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+/* Metrics */
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.mc{background:rgba(10,10,28,.85);border:1px solid var(--border);border-radius:12px;
+  padding:13px;position:relative;overflow:hidden}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--p),transparent)}
+.mc-val{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:900;line-height:1;margin-bottom:3px}
+.mc-label{font-size:.6rem;color:var(--text2);line-height:1.35}
+
+/* Score */
+.score-wrap{background:rgba(10,10,28,.85);border:1px solid var(--border);
+  border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden}
+.score-wrap::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(139,92,246,.05),transparent)}
 .score-num{font-family:'Syne',sans-serif;font-size:4rem;font-weight:900;line-height:1}
-.score-label{font-size:.72rem;color:var(--text2);margin-top:4px}
-.score-bar{width:100%;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-top:12px}
-.score-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.score-tag{font-size:.58rem;color:var(--text2);font-family:'Space Mono',monospace;
+  letter-spacing:.08em;margin-top:5px}
+.sbar{width:100%;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:13px}
+.sfill{height:100%;border-radius:3px;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
 
-/* ── SLIDE 3: EL PROBLEMA ── */
-.problem-list{display:flex;flex-direction:column;gap:10px}
-.problem-item{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px;position:relative;overflow:hidden}
-.problem-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#ef4444}
-.prob-ico{width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.prob-ico svg{width:15px;height:15px;stroke:#ef4444;fill:none;stroke-width:2}
-.prob-text{font-size:.8rem;color:var(--text);line-height:1.5}
-.prob-text b{color:#ff8da0}
-.prob-cost{font-size:.68rem;color:#ef4444;font-family:'Space Mono',monospace;margin-top:4px}
+/* VS */
+.vs-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px}
+.vs-col{background:rgba(10,10,28,.85);border:1px solid var(--border);
+  border-radius:12px;padding:14px;text-align:center}
+.vs-col.win{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.04)}
+.vs-lab{font-size:.56rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text2);margin-bottom:8px}
+.vs-col.win .vs-lab{color:var(--green2)}
+.vs-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;line-height:1}
+.vs-unit{font-size:.62rem;color:var(--text2);margin-top:3px}
+.vs-c{width:32px;height:32px;border-radius:50%;background:var(--bg2);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--text2)}
 
-/* ── SLIDE 4: DINERO PERDIDO ── */
-.money-hero{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.02));border:1px solid rgba(239,68,68,.2);border-radius:16px;padding:24px;text-align:center;margin-bottom:20px}
-.money-amount{font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:900;color:#ef4444;line-height:1;margin-bottom:6px}
-.money-label{font-size:.78rem;color:var(--text2)}
-.money-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.money-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.money-item-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#f97316}
-.money-item-label{font-size:.68rem;color:var(--text2);margin-top:3px;line-height:1.3}
+/* AB */
+.ab-head{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px}
+.ab-lab{text-align:center;font-size:.57rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:5px;border-radius:7px}
+.ab-lab.b{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);color:#ef4444}
+.ab-lab.g{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15);color:#22c55e}
+.ab-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.ab-item{background:rgba(10,10,28,.85);border-radius:9px;padding:9px 10px;
+  font-size:.73rem;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.ab-item.b{border:1px solid rgba(239,68,68,.14);color:var(--text2)}
+.ab-item.g{border:1px solid rgba(34,197,94,.14);color:var(--text)}
+.ab-i svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0;margin-top:1px}
+.ab-item.b .ab-i{color:#ef4444}
+.ab-item.g .ab-i{color:#22c55e}
 
-/* ── SLIDE 5: LA SOLUCIÓN ── */
-.solution-card{background:linear-gradient(135deg,rgba(139,92,246,.08),var(--card));border:1px solid rgba(139,92,246,.3);border-radius:16px;padding:20px;margin-bottom:12px}
-.sol-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.sol-ico{width:40px;height:40px;border-radius:10px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sol-ico svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:1.8}
-.sol-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff}
-.sol-price{font-size:.7rem;color:var(--accent);font-family:'Space Mono',monospace;margin-top:2px}
-.sol-features{display:flex;flex-direction:column;gap:6px}
-.sol-feat{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--text2)}
-.sol-feat svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:2.5;flex-shrink:0}
+/* Price */
+.pcard{background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(10,10,28,.9));
+  border:1px solid rgba(139,92,246,.3);border-radius:17px;padding:20px;
+  position:relative;overflow:hidden;margin-bottom:10px}
+.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--p),var(--accent),transparent)}
+.p-tag{display:inline-block;background:linear-gradient(135deg,var(--p),var(--p2));
+  color:#fff;font-size:.56rem;font-weight:700;padding:3px 10px;
+  border-radius:8px;letter-spacing:.1em;margin-bottom:11px}
+.p-name{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:5px}
+.p-amount{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:900;color:#fff;line-height:1}
+.p-amount span{font-size:.9rem;color:var(--text2);font-weight:400}
+.p-setup{font-size:.62rem;color:var(--text2);margin:4px 0 14px;font-family:'Space Mono',monospace}
+.p-feats{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.p-feat{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--text2)}
+.p-feat svg{width:12px;height:12px;stroke:var(--green);fill:none;stroke-width:2.5;flex-shrink:0}
+.p-cta{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;
+  background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:10px;
+  color:#fff;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+  cursor:pointer;width:100%;text-decoration:none;transition:all .2s}
+.p-cta:active{transform:scale(.97)}
 
-/* ── SLIDE 6: ROI ── */
-.roi-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:20px}
-.roi-col{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
-.roi-col.after{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)}
-.roi-col-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
-.roi-col.after .roi-col-label{color:var(--green2)}
-.roi-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:900;line-height:1}
-.roi-num.red{color:#ef4444}.roi-num.green{color:#22c55e}
-.roi-num-label{font-size:.65rem;color:var(--text2);margin-top:3px}
-.vs-circle{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--text2)}
-.roi-payback{background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.02));border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:18px;text-align:center}
-.roi-payback-num{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:900;color:#22c55e}
-.roi-payback-label{font-size:.76rem;color:var(--text2);margin-top:4px}
+/* Payback */
+.payback{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(10,10,28,.9));
+  border:1px solid rgba(34,197,94,.2);border-radius:13px;padding:16px;
+  text-align:center;margin-top:10px}
+.payback-n{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:900;color:var(--green)}
+.payback-l{font-size:.72rem;color:var(--text2);margin-top:4px}
 
-/* ── SLIDE 7: ANTES / DESPUÉS ── */
-.ab-container{display:flex;flex-direction:column;gap:10px}
-.ab-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.ab-header{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
-.ab-label{text-align:center;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:6px;border-radius:8px}
-.ab-label.before{background:rgba(239,68,68,.1);color:#ef4444}
-.ab-label.after{background:rgba(34,197,94,.1);color:#22c55e}
-.ab-item{background:var(--card);border-radius:10px;padding:10px 12px;font-size:.76rem;display:flex;align-items:center;gap:8px;line-height:1.3}
-.ab-item.bad{border:1px solid rgba(239,68,68,.2);color:var(--text2)}
-.ab-item.good{border:1px solid rgba(34,197,94,.2);color:var(--text)}
-.ab-item svg{width:13px;height:13px;flex-shrink:0}
-.ab-item.bad svg{stroke:#ef4444;fill:none;stroke-width:2}
-.ab-item.good svg{stroke:#22c55e;fill:none;stroke-width:2}
+/* Case */
+.ccase{background:rgba(10,10,28,.85);border:1px solid var(--border);
+  border-radius:13px;padding:16px;margin-bottom:9px;position:relative;overflow:hidden}
+.ccase::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,.35),transparent)}
+.cs-stats{display:flex;justify-content:space-around;margin:11px 0}
+.cs-sn{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:var(--green2);text-align:center}
+.cs-sl{font-size:.57rem;color:var(--text2);margin-top:2px;text-align:center}
+.cs-q{font-size:.7rem;color:var(--text2);font-style:italic;line-height:1.55;
+  border-left:2px solid var(--p);padding-left:9px;margin-top:9px}
 
-/* ── SLIDE 8: CASOS DE ÉXITO ── */
-.case-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px}
-.case-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.case-avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-.case-biz{font-size:.85rem;font-weight:700;color:#fff}
-.case-sector{font-size:.68rem;color:var(--text2)}
-.case-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.case-stat{text-align:center}
-.case-stat-num{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--green2)}
-.case-stat-label{font-size:.6rem;color:var(--text2);margin-top:2px;line-height:1.3}
-.case-quote{font-size:.74rem;color:var(--text2);font-style:italic;line-height:1.55;border-left:2px solid var(--p);padding-left:10px;margin-top:10px}
+/* Close */
+.cstep{display:flex;align-items:center;gap:11px;background:rgba(10,10,28,.85);
+  border:1px solid var(--border);border-radius:11px;padding:11px;margin-bottom:7px}
+.csn{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--p),var(--p2));
+  display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;
+  font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0}
+.cst{font-size:.76rem;color:var(--text2);line-height:1.4}
+.cst b{color:var(--text)}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;
+  background:linear-gradient(135deg,#25d366,#128c7e);border:none;border-radius:13px;
+  color:#fff;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;
+  cursor:pointer;width:100%;text-decoration:none;transition:all .2s;margin-top:8px}
+.wa-btn:active{transform:scale(.97)}
+.wa-btn svg{width:19px;height:19px;fill:#fff;flex-shrink:0}
 
-/* ── SLIDE 9: PRECIO ── */
-.price-card{background:linear-gradient(135deg,rgba(139,92,246,.08),var(--card));border:1px solid rgba(139,92,246,.35);border-radius:18px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden}
-.price-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p),var(--accent))}
-.price-tag{display:inline-block;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:10px;letter-spacing:.1em;margin-bottom:14px}
-.price-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:6px}
-.price-amount{font-family:'Syne',sans-serif;font-size:3.2rem;font-weight:900;color:#fff;line-height:1}
-.price-amount span{font-size:1rem;color:var(--text2);font-weight:400}
-.price-setup{font-size:.72rem;color:var(--text2);margin-top:4px;margin-bottom:18px}
-.price-features{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:20px}
-.price-feat{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text2)}
-.price-feat svg{width:14px;height:14px;stroke:var(--green);fill:none;stroke-width:2.5;flex-shrink:0}
-.price-cta{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:linear-gradient(135deg,var(--p),var(--p2));border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;transition:all .2s;text-decoration:none}
-.price-cta:active{transform:scale(.97)}
-.price-note{font-size:.68rem;color:var(--muted);text-align:center;margin-top:10px}
-
-/* ── SLIDE 10: CIERRE ── */
-#s10{background:radial-gradient(ellipse at 70% 80%,rgba(124,58,237,.2) 0%,transparent 60%),var(--bg)}
-.close-emoji{font-size:3rem;margin-bottom:16px;display:block}
-.close-steps{display:flex;flex-direction:column;gap:10px;margin:20px 0}
-.close-step{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
-.step-num{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--p2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
-.step-text{font-size:.8rem;color:var(--text2);line-height:1.4}
-.step-text b{color:var(--text)}
-.close-wa{display:flex;align-items:center;justify-content:center;gap:9px;padding:16px;background:linear-gradient(135deg,#25d366,#128c7e);border:none;border-radius:14px;color:#fff;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;margin-top:8px;text-decoration:none;transition:all .2s}
-.close-wa:active{transform:scale(.97)}
-.close-wa svg{width:20px;height:20px;fill:#fff}
-
-/* ── ANIMATIONS ── */
-@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-.slide.active .s-wrap>*{animation:fadeInUp .4s ease both}
-.slide.active .s-wrap>*:nth-child(1){animation-delay:.05s}
-.slide.active .s-wrap>*:nth-child(2){animation-delay:.1s}
-.slide.active .s-wrap>*:nth-child(3){animation-delay:.15s}
-.slide.active .s-wrap>*:nth-child(4){animation-delay:.2s}
-.slide.active .s-wrap>*:nth-child(5){animation-delay:.25s}
-
-@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* Anims */
+@keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
+.slide.active .sw>*{animation:fadeUp .4s ease both}
+.slide.active .sw>*:nth-child(1){animation-delay:.05s}
+.slide.active .sw>*:nth-child(2){animation-delay:.12s}
+.slide.active .sw>*:nth-child(3){animation-delay:.19s}
+.slide.active .sw>*:nth-child(4){animation-delay:.26s}
+.slide.active .sw>*:nth-child(5){animation-delay:.32s}
 </style>
 </head>
 <body>
 
-<!-- SETUP -->
+<!-- BG -->
+<div class="gbg">
+  <div class="gbg-grid"></div>
+  <div class="gbg-o1"></div><div class="gbg-o2"></div><div class="gbg-o3"></div>
+  <div class="gbg-scan"></div>
+</div>
+
+<!-- CHIPS -->
+<div class="chip" id="c1" style="top:10%;right:4%;animation:chipf1 5s ease-in-out infinite">
+  <div class="chip-val">+342%</div>
+  <div class="chip-label"><span class="chip-dot"></span>ROI con IA</div>
+</div>
+<div class="chip" id="c2" style="top:62%;left:2%;animation:chipf2 7s ease-in-out infinite 1s">
+  <div class="chip-val">24/7</div>
+  <div class="chip-label"><span class="chip-dot"></span>Sin parar</div>
+</div>
+<div class="chip" id="c3" style="bottom:20%;right:3%;animation:chipf3 6s ease-in-out infinite 2s">
+  <div class="chip-val">9x</div>
+  <div class="chip-label"><span class="chip-dot"></span>Conversión</div>
+</div>
+
+<!-- ═══ SETUP ═══ -->
 <div id="setup">
-  <div style="margin-bottom:32px">
-    <div class="setup-logo"><span>White</span>Moon · Kit de Ventas</div>
-    <div class="setup-sub">Rellena los datos del cliente antes de la visita</div>
-  </div>
-  <div class="setup-form">
-    <input class="setup-input" id="s-biz" placeholder="Nombre del negocio" autocomplete="off">
-    <input class="setup-input" id="s-contact" placeholder="Nombre del contacto (opcional)" autocomplete="off">
-    <select class="setup-select" id="s-sector">
-      <option value="">Sector del negocio...</option>
-      <option value="dental">🦷 Clínica Dental</option>
-      <option value="restaurante">🍽️ Restaurante</option>
-      <option value="belleza">💅 Centro de Estética</option>
-      <option value="peluqueria">✂️ Peluquería</option>
-      <option value="abogado">⚖️ Despacho de Abogados</option>
-      <option value="gestoria">📊 Gestoría / Asesoría</option>
-      <option value="taller">🚗 Taller Mecánico</option>
-      <option value="veterinaria">🐾 Clínica Veterinaria</option>
-      <option value="inmobiliaria">🏠 Inmobiliaria</option>
-      <option value="academia">📚 Academia / Formación</option>
-      <option value="gimnasio">💪 Gimnasio / Fitness</option>
-      <option value="farmacia">💊 Farmacia</option>
-      <option value="fisioterapia">🦴 Fisioterapia</option>
-      <option value="hotel">🏨 Hotel / Alojamiento</option>
-      <option value="otro">🏪 Otro negocio</option>
-    </select>
-    <select class="setup-select" id="s-score">
-      <option value="">Situación actual de su web...</option>
-      <option value="sin-web">Sin web o muy básica</option>
-      <option value="sin-chatbot">Web OK pero sin chatbot</option>
-      <option value="sin-wa">Sin WhatsApp Business</option>
-      <option value="todo-mal">Sin web, sin chatbot, sin WA</option>
-    </select>
-    <div class="field-group">
-      <label>Visitas web/mes (aproximado)</label>
-      <select class="setup-select" id="s-visits">
-        <option value="200">Menos de 200 visitas</option>
-        <option value="500" selected>200-500 visitas</option>
-        <option value="1000">500-1.000 visitas</option>
-        <option value="2000">Más de 1.000 visitas</option>
+  <div class="su-inner">
+    <div class="su-logo">
+      <div class="su-ico"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+      <div class="su-name"><span>White</span>Moon IA</div>
+    </div>
+    <div class="su-tag">// KIT DE VENTAS · PRESENTACIÓN INTELIGENTE</div>
+    <div class="su-card">
+      <div class="tech-bar"></div>
+      <div class="su-sec">Datos del cliente</div>
+      <input class="su-in" id="s-biz" placeholder="Nombre del negocio *" autocomplete="off">
+      <input class="su-in" id="s-contact" placeholder="Nombre del contacto (opcional)" autocomplete="off">
+      <select class="su-in" id="s-sector" style="appearance:none;cursor:pointer">
+        <option value="">Sector del negocio *</option>
+        <option value="dental">🦷 Clínica Dental</option>
+        <option value="restaurante">🍽️ Restaurante</option>
+        <option value="belleza">💅 Centro de Estética</option>
+        <option value="peluqueria">✂️ Peluquería / Barbería</option>
+        <option value="abogado">⚖️ Despacho de Abogados</option>
+        <option value="gestoria">📊 Gestoría / Asesoría</option>
+        <option value="taller">🚗 Taller Mecánico</option>
+        <option value="veterinaria">🐾 Clínica Veterinaria</option>
+        <option value="inmobiliaria">🏠 Inmobiliaria</option>
+        <option value="academia">📚 Academia / Formación</option>
+        <option value="gimnasio">💪 Gimnasio / Fitness</option>
+        <option value="fisioterapia">🦴 Fisioterapia</option>
+        <option value="otro">🏪 Otro negocio local</option>
       </select>
-    </div>
-    <div class="field-group">
-      <label>Ticket medio por cliente (€)</label>
-      <input class="setup-input" type="number" id="s-ticket" placeholder="Ej: 150" min="10" max="5000">
-      <div class="field-note">Cuánto gasta de media cada cliente</div>
-    </div>
-    <div class="field-group">
-      <label>Llamadas/consultas perdidas por semana</label>
-      <select class="setup-select" id="s-calls">
-        <option value="3">1-5 llamadas</option>
-        <option value="10" selected>5-15 llamadas</option>
-        <option value="20">15-30 llamadas</option>
-        <option value="40">Más de 30 llamadas</option>
+      <div class="su-sec">Situación digital actual</div>
+      <select class="su-in" id="s-score" style="appearance:none;cursor:pointer">
+        <option value="sin-chatbot" selected>Web OK pero sin chatbot IA</option>
+        <option value="todo-mal">Sin web o web muy básica</option>
+        <option value="sin-wa">Sin WhatsApp Business</option>
       </select>
+      <div class="su-row">
+        <input class="su-in" id="s-ticket" type="number" placeholder="Ticket medio €" min="10" max="9999" style="margin-bottom:0">
+        <select class="su-in" id="s-calls" style="appearance:none;cursor:pointer;margin-bottom:0">
+          <option value="3">~3 consultas/sem perdidas</option>
+          <option value="8" selected>~8 consultas/sem</option>
+          <option value="20">~20 consultas/sem</option>
+          <option value="40">+40 consultas/sem</option>
+        </select>
+      </div>
+      <button class="su-btn" onclick="startKit()">⚡ Iniciar presentación IA</button>
     </div>
-    <button class="setup-btn" onclick="startPresentation()">
-      ⚡ Iniciar presentación
-    </button>
-    <div class="setup-note">La presentación se adapta automáticamente al sector</div>
   </div>
 </div>
 
-<!-- SLIDES -->
+<!-- ═══ SLIDES ═══ -->
 <div id="slides">
 
-  <!-- S1: PORTADA -->
-  <div class="slide" id="s1">
-    <img id="p-hero-1" class="slide-bg-img dim-strong" loading="lazy" alt="">
-    <div class="s-wrap" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
-      <div class="s1-logo">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+<!-- S1 PORTADA -->
+<div class="slide" id="s1">
+  <div class="sw" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
+    <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--p);letter-spacing:.2em;margin-bottom:14px">▶ WHITEMOON AGENCIA IA · PRESENTACIÓN</div>
+    <div class="tech-bar"></div>
+    <div class="stitle" style="font-size:clamp(1.9rem,7vw,3rem)">La IA que va a<br><span class="grad">transformar</span><br>tu negocio</div>
+    <div class="ssub" style="margin-top:10px">Preparado para <span id="p1-biz" style="color:var(--accent);font-weight:600">tu negocio</span></div>
+    <div class="terminal">
+      <div class="t-head">
+        <div class="td td1"></div><div class="td td2"></div><div class="td td3"></div>
+        <span class="t-title">whitemoon-ai · análisis en curso</span>
       </div>
-      <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.15em;margin-bottom:12px">WHITEMOON AGENCIA IA</div>
-      <div class="s1-title">Cómo la IA<br>va a transformar<br><span style="background:linear-gradient(135deg,#c084fc,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">tu negocio</span></div>
-      <div class="s1-divider" style="margin:16px 0"></div>
-      <div class="s1-biz" id="p-biz-1">Nombre del negocio</div>
-      <div class="s1-sector" id="p-sector-1">Sector</div>
-      <div class="s1-wm">whitemoon.es · Majadahonda, Madrid</div>
+      <div class="tl"><span class="tl-prompt">›</span><span>Analizando <span id="t1-biz" style="color:var(--accent)">—</span></span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span class="tl-ok">✓</span><span class="tl-val"> Sector: </span><span id="t1-sec" style="color:var(--cyan)">—</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span class="tl-ok">✓</span><span class="tl-val"> Oportunidades IA detectadas</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span class="tl-dim">// Presentación lista · iniciando...</span></div>
     </div>
+    <div style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted);margin-top:14px">whitemoon.es · Majadahonda, Madrid · <span id="p1-date"></span></div>
   </div>
-
-  <!-- S2: DIAGNÓSTICO -->
-  <div class="slide" id="s2">
-    <div class="s-wrap">
-      <div class="s-badge">📊 Diagnóstico digital</div>
-      <div class="s-title">Así está tu<br>negocio <span class="grad">ahora mismo</span></div>
-      <div class="s-sub">Hemos analizado tu presencia digital. Este es el resultado:</div>
-      <div class="score-ring">
-        <div class="score-num" id="p-score" style="color:#ef4444">0%</div>
-        <div class="score-label">Puntuación digital (sobre 100)</div>
-        <div class="score-bar"><div class="score-fill" id="p-score-bar" style="width:0%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
-      </div>
-      <div class="diag-grid" id="p-diag-grid">
-        <!-- generado por JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- S3: EL PROBLEMA -->
-  <div class="slide" id="s3">
-    <div class="s-wrap">
-      <img id="p-problem-img" class="slide-img problem" loading="lazy" alt="">
-      <div class="s-badge">⚠️ El problema</div>
-      <div class="s-title">Lo que te está<br>costando <span class="grad">dinero</span></div>
-      <div class="s-sub" id="p-contact-greeting">Cada día sin IA digital, pierdes clientes que van a tu competencia.</div>
-      <div class="problem-list" id="p-problems">
-        <!-- generado por JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- S4: DINERO PERDIDO -->
-  <div class="slide" id="s4">
-    <div class="s-wrap">
-      <div class="s-badge">💸 Impacto económico</div>
-      <div class="s-title">Cuánto estás<br><span class="grad">perdiendo al mes</span></div>
-      <div class="money-hero">
-        <div class="money-amount" id="p-lost">0€</div>
-        <div class="money-label">estimado en oportunidades perdidas / mes</div>
-      </div>
-      <div class="money-breakdown" id="p-money-breakdown">
-        <!-- generado por JS -->
-      </div>
-      <div style="font-size:.7rem;color:var(--muted);text-align:center;margin-top:12px">*Estimación basada en datos del sector y tráfico medio de negocios similares</div>
-    </div>
-  </div>
-
-  <!-- S5: LA SOLUCIÓN -->
-  <div class="slide" id="s5">
-    <div class="s-wrap">
-      <div class="team-frame">
-        <img id="p-team-img" class="slide-img team" loading="lazy" alt="">
-        <div class="team-overlay">Tu negocio con WhiteMoon IA</div>
-      </div>
-      <div class="s-badge">✅ La solución</div>
-      <div class="s-title">WhiteMoon instala<br>tu <span class="grad">agente IA</span></div>
-      <div class="s-sub">Operativo en 48 horas. Sin que tengas que hacer nada técnico.</div>
-      <div id="p-solutions"><!-- generado por JS --></div>
-    </div>
-  </div>
-
-  <!-- S6: ROI -->
-  <div class="slide" id="s6">
-    <div class="s-wrap">
-      <div class="s-badge">📈 Retorno de inversión</div>
-      <div class="s-title">Lo que ganas<br>con <span class="grad">WhiteMoon</span></div>
-      <div class="roi-vs">
-        <div class="roi-col">
-          <div class="roi-col-label">Sin IA</div>
-          <div class="roi-num red" id="roi-before">2%</div>
-          <div class="roi-num-label">conversión web</div>
-        </div>
-        <div class="vs-circle">VS</div>
-        <div class="roi-col after">
-          <div class="roi-col-label">Con WhiteMoon</div>
-          <div class="roi-num green" id="roi-after">9%</div>
-          <div class="roi-num-label">conversión web</div>
-        </div>
-      </div>
-      <div class="roi-payback">
-        <div class="roi-payback-num" id="roi-payback">2 meses</div>
-        <div class="roi-payback-label">para recuperar la inversión</div>
-      </div>
-      <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px">
-        <div style="font-size:.68rem;color:var(--text2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.08em">Qué significa en euros</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="roi-euros">
-          <!-- generado por JS -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- S7: ANTES / DESPUÉS -->
-  <div class="slide" id="s7">
-    <div class="s-wrap">
-      <div class="s-badge">⚡ Transformación</div>
-      <div class="s-title">Antes y después<br>de <span class="grad">WhiteMoon</span></div>
-      <div class="ab-header">
-        <div class="ab-label before">✗ Sin IA</div>
-        <div class="ab-label after">✓ Con WhiteMoon</div>
-      </div>
-      <div class="ab-container" id="p-ab">
-        <!-- generado por JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- S8: CASOS DE ÉXITO -->
-  <div class="slide" id="s8">
-    <div class="s-wrap">
-      <div class="s-badge">⭐ Casos reales</div>
-      <div class="s-title">Negocios que ya<br>usan <span class="grad">WhiteMoon IA</span></div>
-      <div id="p-cases"><!-- generado por JS --></div>
-    </div>
-  </div>
-
-  <!-- S9: PRECIO -->
-  <div class="slide" id="s9">
-    <div class="s-wrap">
-      <div class="s-badge">💎 Tu plan recomendado</div>
-      <div class="s-title">Empieza hoy<br>por <span class="grad" id="p-price-title">149€/mes</span></div>
-      <div class="price-card" id="p-price-card">
-        <!-- generado por JS -->
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:.76rem;color:var(--text2);line-height:1.6">
-        <b style="color:var(--text)">¿Qué pasa si no me gusta?</b><br>
-        Sin permanencia. Cancelas cuando quieras. Sin letra pequeña. Sin penalizaciones.
-      </div>
-    </div>
-  </div>
-
-  <!-- S10: CIERRE -->
-  <div class="slide" id="s10">
-    <img id="p-hero-10" class="slide-bg-img dim-extreme" loading="lazy" alt="">
-    <div class="s-wrap" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
-      <span class="close-emoji">🚀</span>
-      <div class="s-badge">Siguiente paso</div>
-      <div class="s-title">Empezamos<br><span class="grad">esta semana</span></div>
-      <div class="s-sub">En 48 horas tu chatbot IA está activo y captando clientes.</div>
-      <div class="close-steps">
-        <div class="close-step">
-          <div class="step-num">1</div>
-          <div class="step-text"><b>Hoy</b> — Confirmamos el pack y firmamos</div>
-        </div>
-        <div class="close-step">
-          <div class="step-num">2</div>
-          <div class="step-text"><b>Mañana</b> — Configuramos tu agente IA personalizado</div>
-        </div>
-        <div class="close-step">
-          <div class="step-num">3</div>
-          <div class="step-text"><b>En 48h</b> — Tu chatbot está online capturando leads</div>
-        </div>
-      </div>
-      <a class="close-wa" id="p-wa-btn" href="#" target="_blank">
-        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.123.556 4.112 1.528 5.837L.057 23.215c-.073.266.173.512.44.44l5.42-1.463A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.368l-.36-.214-3.716 1.003 1.02-3.617-.235-.373A9.818 9.818 0 0112 2.182c5.426 0 9.818 4.392 9.818 9.818 0 5.427-4.392 9.818-9.818 9.818z"/></svg>
-        Empezar ahora por WhatsApp
-      </a>
-    </div>
-  </div>
-
 </div>
 
-<!-- NAV -->
-<div class="slide-nav" id="slide-nav" style="display:none">
-  <button class="nav-btn btn-prev" onclick="prevSlide()">← Atrás</button>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-    <div class="nav-dots" id="nav-dots"></div>
-    <div class="slide-counter" id="slide-counter">1 / 10</div>
+<!-- S2 DIAGNÓSTICO -->
+<div class="slide" id="s2">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Análisis IA completado</div>
+    <div class="stitle">Diagnóstico de<br><span class="grad" id="p2-biz">tu negocio</span></div>
+    <div class="score-wrap">
+      <div style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--text2);margin-bottom:7px;letter-spacing:.1em">PUNTUACIÓN DIGITAL ACTUAL</div>
+      <div class="score-num" id="p2-score">0%</div>
+      <div class="score-tag">sobre 100 puntos posibles</div>
+      <div class="sbar"><div class="sfill" id="p2-bar" style="width:0%"></div></div>
+    </div>
+    <div class="mrow" id="p2-metrics"></div>
+    <div class="terminal">
+      <div class="t-head"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div><span class="t-title">diagnóstico · resultado</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span id="t2-l1" class="tl-err">ERROR: Sin chatbot IA detectado</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span id="t2-l2" class="tl-warn">WARN: Consultas perdidas fuera de horario</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span style="color:var(--p)">INFO: Potencial de mejora elevado</span></div>
+    </div>
   </div>
-  <button class="nav-btn btn-next" onclick="nextSlide()">Siguiente →</button>
+</div>
+
+<!-- S3 PROBLEMAS -->
+<div class="slide" id="s3">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot" style="background:var(--red)"></div>Problemas detectados</div>
+    <div class="stitle">Lo que te cuesta<br><span style="color:#ef4444">dinero</span> hoy</div>
+    <div class="ssub" id="p3-sub">Cada día sin IA pierdes clientes que van a tu competencia.</div>
+    <div id="p3-probs"></div>
+  </div>
+</div>
+
+<!-- S4 DINERO PERDIDO -->
+<div class="slide" id="s4">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot" style="background:var(--red)"></div>Impacto económico</div>
+    <div class="stitle">Estás perdiendo<br><span style="color:#ef4444" id="p4-lost">0€</span><br><span style="font-size:1.1rem;font-weight:700;color:var(--text2)">al mes en oportunidades</span></div>
+    <div class="tech-bar"></div>
+    <div class="mrow" id="p4-breakdown"></div>
+    <div class="terminal">
+      <div class="t-head"><div class="td td1"></div><div class="td td2"></div><div class="td td3"></div><span class="t-title">cálculo · pérdidas reales</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span class="tl-dim">// consultas_mes × ticket × tasa_conv</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span id="t4-calc" class="tl-err">calculando...</span></div>
+      <div class="tl"><span class="tl-prompt">›</span><span class="tl-warn">ALERTA: Dinero real sin capturar</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- S5 SOLUCIÓN -->
+<div class="slide" id="s5">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Solución WhiteMoon IA</div>
+    <div class="stitle">Tu agente IA<br>activo en <span class="grad-c">48 horas</span></div>
+    <div class="ssub">Sin tecnicismos. Lo configuramos e instalamos nosotros.</div>
+    <div id="p5-sols"></div>
+  </div>
+</div>
+
+<!-- S6 ROI -->
+<div class="slide" id="s6">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Retorno de inversión</div>
+    <div class="stitle">Multiplicas<br><span class="grad-g">tu conversión</span></div>
+    <div class="vs-wrap">
+      <div class="vs-col">
+        <div class="vs-lab">Sin IA ahora</div>
+        <div class="vs-num" style="color:#ef4444">2%</div>
+        <div class="vs-unit">conversión web</div>
+      </div>
+      <div class="vs-c">VS</div>
+      <div class="vs-col win">
+        <div class="vs-lab">Con WhiteMoon</div>
+        <div class="vs-num" style="color:#22c55e">9%</div>
+        <div class="vs-unit">conversión web</div>
+      </div>
+    </div>
+    <div class="mrow" id="p6-euros"></div>
+    <div class="payback">
+      <div class="payback-n" id="p6-payback">2 meses</div>
+      <div class="payback-l">para recuperar la inversión completa</div>
+    </div>
+  </div>
+</div>
+
+<!-- S7 ANTES/DESPUÉS -->
+<div class="slide" id="s7">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Transformación digital</div>
+    <div class="stitle">Antes y después<br>de <span class="grad">WhiteMoon</span></div>
+    <div class="ab-head">
+      <div class="ab-lab b">✗ SIN IA</div>
+      <div class="ab-lab g">✓ CON WHITEMOON</div>
+    </div>
+    <div id="p7-ab"></div>
+  </div>
+</div>
+
+<!-- S8 CASOS -->
+<div class="slide" id="s8">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Casos reales verificados</div>
+    <div class="stitle">Negocios que ya<br>usan <span class="grad">IA WhiteMoon</span></div>
+    <div id="p8-cases"></div>
+  </div>
+</div>
+
+<!-- S9 PRECIO -->
+<div class="slide" id="s9">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Tu plan recomendado</div>
+    <div class="stitle">Empieza desde<br><span class="grad" id="p9-title">149€/mes</span></div>
+    <div id="p9-card"></div>
+    <div class="acard pur">
+      <div class="acard-top">
+        <div class="acard-ico i-pur"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="acard-title">Sin permanencia garantizada</div>
+      </div>
+      <div class="acard-sub">Cancelas cuando quieras. Sin penalizaciones. Sin letra pequeña.</div>
+    </div>
+  </div>
+</div>
+
+<!-- S10 CIERRE -->
+<div class="slide" id="s10">
+  <div class="sw" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
+    <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--green);letter-spacing:.15em;margin-bottom:13px">▶ SIGUIENTE PASO</div>
+    <div class="tech-bar"></div>
+    <div class="stitle" style="margin-bottom:8px">Empezamos<br><span class="grad-g">esta semana</span></div>
+    <div class="ssub">En 48h tu agente IA activo capturando leads para <span id="p10-biz" style="color:var(--accent);font-weight:600">tu negocio</span>.</div>
+    <div id="p10-steps"></div>
+    <a class="wa-btn" id="p10-wa" href="#" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.123.556 4.112 1.528 5.837L.057 23.215c-.073.266.173.512.44.44l5.42-1.463A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.368l-.36-.214-3.716 1.003 1.02-3.617-.235-.373A9.818 9.818 0 0112 2.182c5.426 0 9.818 4.392 9.818 9.818 0 5.427-4.392 9.818-9.818 9.818z"/></svg>
+      Empezar ahora por WhatsApp
+    </a>
+  </div>
+</div>
+
+</div><!-- /slides -->
+
+<!-- NAV -->
+<div class="snav" id="snav" style="display:none">
+  <button class="nb np" onclick="prev()">← Atrás</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+    <div class="dots" id="dots"></div>
+    <div class="sc" id="sc">1 / 10</div>
+  </div>
+  <button class="nb nn" onclick="next()">Siguiente →</button>
 </div>
 
 <script>
-var BIZ='', CONTACT='', SECTOR='', SCORE_SIT='';
-var currentSlide=0, totalSlides=10;
-var WA_NUM='34643199580';
+var BIZ='',CONTACT='',SECTOR='',SIT='',TICKET=0,CALLS=8,cur=0,TOT=10,WA='34643199580';
 
-// SECTOR DATA
-var SECTOR_DATA={
-  dental:{
-    name:'Clínica Dental',ico:'🦷',
-    ticket:280,visits:800,
-    problems:[
-      {ico:'phone',text:'Llamadas perdidas fuera de horario',cost:'~8 pacientes/mes perdidos'},
-      {ico:'calendar',text:'Sin sistema de citas online 24/7',cost:'30% de leads se van a la competencia'},
-      {ico:'chat',text:'Sin chatbot — nadie responde de noche',cost:'Urgencias sin atender = paciente perdido para siempre'},
-      {ico:'star',text:'Sin gestión automatizada de reseñas',cost:'Tu reputación online no crece'}
-    ],
-    cases:[
-      {ico:'🦷',name:'Clínica Dental Sur',loc:'Sevilla',stats:['+42%','8 min','4.9★'],labels:['más citas','respuesta','en Google'],quote:'"El chatbot agenda mientras dormimos. Increíble."'}
-    ],
-    abItems:[
-      ['Teléfono sin atender de noche','Chatbot IA atiende 24/7'],
-      ['Paciente espera y llama a otro','Responde en segundos'],
-      ['Sin recordatorio de citas','WhatsApp automático -60% no-shows'],
-      ['Sin reseñas gestionadas','Solicita reseñas automáticamente']
-    ]
-  },
-  restaurante:{
-    name:'Restaurante',ico:'🍽️',
-    ticket:35,visits:600,
-    problems:[
-      {ico:'phone',text:'Reservas perdidas cuando estáis en servicio',cost:'~15 reservas/mes perdidas'},
-      {ico:'cart',text:'Sin pedidos online ni takeaway digital',cost:'Canal de ingresos extra desaprovechado'},
-      {ico:'chat',text:'WhatsApp sin respuesta automática',cost:'Cliente sin respuesta = cliente perdido'},
-      {ico:'star',text:'Sin gestión de reseñas Google',cost:'Competencia con más reseñas gana clientes'}
-    ],
-    cases:[
-      {ico:'🍽️',name:'Restaurante La Bodega',loc:'Valencia',stats:['+38%','2 min','4.8★'],labels:['más reservas','respuesta','en Google'],quote:'"Las reservas de noche ahora se gestionan solas."'}
-    ],
-    abItems:[
-      ['Reservas solo por teléfono','Reservas 24/7 por WhatsApp/web'],
-      ['Sin pedidos takeaway digital','Sistema de pedidos con carta online'],
-      ['Sin recordatorio de reserva','Confirmación automática anti no-show'],
-      ['Carta solo en papel','Carta digital con fotos y precios']
-    ]
-  },
-  belleza:{
-    name:'Centro de Estética',ico:'💅',
-    ticket:65,visits:500,
-    problems:[
-      {ico:'calendar',text:'Citas solo por teléfono o presencial',cost:'~12 citas/mes perdidas'},
-      {ico:'phone',text:'No-shows sin recordatorio previo',cost:'20% de citas no se presentan'},
-      {ico:'chat',text:'Sin chatbot de consulta de tratamientos',cost:'Clientas van a la competencia que sí responde'},
-      {ico:'star',text:'Sin captación automática de nuevas clientas',cost:'Crecimiento solo por boca a boca'}
-    ],
-    cases:[
-      {ico:'💅',name:'Centro Belleza Lumière',loc:'Madrid',stats:['+51%','5 min','4.9★'],labels:['más citas','respuesta','en Google'],quote:'"Los no-shows bajaron un 65% con los recordatorios."'}
-    ],
-    abItems:[
-      ['Citas solo en horario de trabajo','Reservas online 24/7'],
-      ['No-shows frecuentes','Recordatorio automático -65% faltas'],
-      ['Sin información de tratamientos 24h','Chatbot informa y asesora siempre'],
-      ['Captación solo presencial','Leads digitales automáticos']
-    ]
-  },
-  peluqueria:{
-    name:'Peluquería',ico:'✂️',
-    ticket:45,visits:400,
-    problems:[
-      {ico:'calendar',text:'Agenda llena de llamadas para reservar',cost:'Tiempo perdido en llamadas innecesarias'},
-      {ico:'phone',text:'No-shows sin avisar',cost:'~8 huecos vacíos/semana'},
-      {ico:'chat',text:'Sin presencia activa en redes',cost:'Nuevas clientas no te encuentran'},
-      {ico:'star',text:'Sin fidelización digital',cost:'Clientas que no repiten'}
-    ],
-    cases:[
-      {ico:'✂️',name:'Peluquería Glamour',loc:'Barcelona',stats:['+44%','3 min','4.8★'],labels:['más citas','respuesta','en Google'],quote:'"Ahora las chicas reservan a las 11 de la noche."'}
-    ],
-    abItems:[
-      ['Reservas solo por llamada','Reservas por WhatsApp/web 24h'],
-      ['No-shows sin control','Recordatorio 24h antes -60% faltas'],
-      ['Sin galería de trabajos digital','Portfolio online con antes/después'],
-      ['Sin programa de fidelización','Bono automático para clientas frecuentes']
-    ]
-  },
-  abogado:{
-    name:'Despacho de Abogados',ico:'⚖️',
-    ticket:600,visits:300,
-    problems:[
-      {ico:'phone',text:'Consultas urgentes sin atender fuera de horario',cost:'Cliente urgente llama al siguiente de la lista'},
-      {ico:'chat',text:'Sin cualificación automática de leads',cost:'Tiempo perdido en consultas no rentables'},
-      {ico:'calendar',text:'Sin agenda online de consultas',cost:'Proceso de captación largo y manual'},
-      {ico:'star',text:'Sin presencia digital activa',cost:'Clientes te buscan y no te encuentran'}
-    ],
-    cases:[
-      {ico:'⚖️',name:'Bufete García & Asociados',loc:'Madrid',stats:['+67%','8 min','4.9★'],labels:['más consultas','respuesta','en Google'],quote:'"El chatbot cualifica los casos antes de que los veamos."'}
-    ],
-    abItems:[
-      ['Consultas urgentes sin atender','Chatbot atiende y recoge datos 24/7'],
-      ['Leads sin cualificar','Cualificación automática por tipo de caso'],
-      ['Agenda manual por teléfono','Citas online con confirmación automática'],
-      ['Sin contenido digital','Blog y FAQ automático posicionamiento SEO']
-    ]
-  },
-  gestoria:{
-    name:'Gestoría / Asesoría',ico:'📊',
-    ticket:200,visits:350,
-    problems:[
-      {ico:'phone',text:'Consultas básicas que ocupan tiempo del equipo',cost:'3h/día en consultas que podría resolver IA'},
-      {ico:'chat',text:'Sin captación de nuevos autónomos/empresas',cost:'Competencia con web + chatbot capta tus clientes'},
-      {ico:'calendar',text:'Sin gestión digital de documentos',cost:'Clientes llaman para saber estados de trámites'},
-      {ico:'star',text:'Sin recordatorios de obligaciones fiscales',cost:'Clientes insatisfechos por falta de proactividad'}
-    ],
-    cases:[
-      {ico:'📊',name:'Gestoría Martínez',loc:'Zaragoza',stats:['+38%','5 min','4.8★'],labels:['nuevos clientes','respuesta','en Google'],quote:'"El chatbot responde las dudas básicas y nosotros nos centramos en lo importante."'}
-    ],
-    abItems:[
-      ['Consultas básicas ocupan al equipo','Chatbot resuelve dudas frecuentes 24/7'],
-      ['Captación solo por recomendación','Formularios inteligentes en web'],
-      ['Clientes llaman por estado trámites','Notificaciones automáticas por WhatsApp'],
-      ['Sin recordatorios fiscales proactivos','Alertas automáticas de plazos importantes']
-    ]
-  },
-  taller:{
-    name:'Taller Mecánico',ico:'🚗',
-    ticket:180,visits:400,
-    problems:[
-      {ico:'phone',text:'Llamadas perdidas cuando estás en el foso',cost:'~10 clientes/mes van a la competencia'},
-      {ico:'calendar',text:'Sin citas online — todo por teléfono',cost:'Clientes no encuentran hueco y se van'},
-      {ico:'chat',text:'Sin recordatorio de revisiones y ITV',cost:'Clientes que no vuelven por olvido'},
-      {ico:'star',text:'Sin presupuesto online automático',cost:'Clientes que preguntan precio y no vuelven'}
-    ],
-    cases:[
-      {ico:'🚗',name:'Taller Mecánico García',loc:'Bilbao',stats:['+45%','4 min','4.7★'],labels:['más citas','respuesta','en Google'],quote:'"Los recordatorios de ITV han disparado las revisiones."'}
-    ],
-    abItems:[
-      ['Teléfono sin respuesta en horario','Chatbot atiende y agenda 24/7'],
-      ['Sin citas online','Sistema de citas digital con confirmación'],
-      ['Sin recordatorios de mantenimiento','Alertas automáticas ITV/revisiones'],
-      ['Presupuesto solo presencial','Presupuesto orientativo online']
-    ]
-  },
-  veterinaria:{
-    name:'Clínica Veterinaria',ico:'🐾',
-    ticket:95,visits:500,
-    problems:[
-      {ico:'phone',text:'Urgencias nocturnas sin atender',cost:'Mascota enferma = dueño desesperado que busca otro'},
-      {ico:'calendar',text:'Sin recordatorio de vacunas y revisiones',cost:'~25% de pacientes no vuelven por olvido'},
-      {ico:'chat',text:'Sin triaje automático de urgencias',cost:'Llamadas innecesarias saturan la clínica'},
-      {ico:'star',text:'Sin captación digital de nuevos pacientes',cost:'Solo crecen por boca a boca'}
-    ],
-    cases:[
-      {ico:'🐾',name:'Clínica Veterinaria Mar',loc:'Alicante',stats:['+52%','3 min','4.9★'],labels:['más consultas','respuesta','en Google'],quote:'"El recordatorio de vacunas ha disparado las consultas."'}
-    ],
-    abItems:[
-      ['Urgencias nocturnas sin respuesta','Chatbot atiende y orienta 24/7'],
-      ['Sin recordatorio de vacunas','Alertas automáticas calendario sanitario'],
-      ['Triaje manual por teléfono','Triaje automático por síntomas'],
-      ['Captación solo presencial','Formulario de nueva mascota online']
-    ]
-  },
-  farmacia:{
-    name:'Farmacia',ico:'💊',
-    ticket:25,visits:700,
-    problems:[
-      {ico:'phone',text:'Consultas sobre disponibilidad fuera de horario',cost:'Cliente busca en otra farmacia y no vuelve'},
-      {ico:'chat',text:'Sin chatbot que resuelva dudas frecuentes',cost:'Personal saturado en mostrador'},
-      {ico:'calendar',text:'Sin recordatorio de tratamientos crónicos',cost:'Clientes recurrentes que no vuelven a tiempo'},
-      {ico:'star',text:'Sin captación digital del barrio',cost:'Competencia con farmacia online capta tu zona'}
-    ],
-    cases:[
-      {ico:'💊',name:'Farmacia Central',loc:'Madrid',stats:['+36%','2 min','4.9★'],labels:['más consultas','respuesta','en Google'],quote:'"El chatbot resuelve las dudas básicas y el equipo se centra en el paciente."'}
-    ],
-    abItems:[
-      ['Consultas saturando el mostrador','Chatbot resuelve dudas frecuentes 24/7'],
-      ['Sin recordatorios de tratamientos','Alertas automáticas de medicación'],
-      ['Sin reserva de productos online','Reserva y aviso de disponibilidad'],
-      ['Sin presencia digital activa','Captación local con SEO y WhatsApp']
-    ]
-  },
-  fisioterapia:{
-    name:'Fisioterapia',ico:'🦴',
-    ticket:50,visits:450,
-    problems:[
-      {ico:'calendar',text:'Citas solo por teléfono y en horario',cost:'~10 citas/mes perdidas fuera de horario'},
-      {ico:'phone',text:'No-shows sin recordatorio previo',cost:'Huecos vacíos = ingresos perdidos'},
-      {ico:'chat',text:'Sin chatbot que oriente sobre tratamientos',cost:'Pacientes potenciales se van a la competencia'},
-      {ico:'star',text:'Sin captación digital de nuevos pacientes',cost:'Crecimiento solo por boca a boca'}
-    ],
-    cases:[
-      {ico:'🦴',name:'Centro Fisio Activa',loc:'Valencia',stats:['+47%','4 min','4.9★'],labels:['más citas','respuesta','en Google'],quote:'"Los recordatorios bajaron los no-shows un 60%."'}
-    ],
-    abItems:[
-      ['Citas solo en horario laboral','Reservas online 24/7'],
-      ['No-shows frecuentes','Recordatorio automático -60% faltas'],
-      ['Sin info de tratamientos 24h','Chatbot orienta y agenda primera sesión'],
-      ['Sin seguimiento post-tratamiento','Cuestionarios automáticos de evolución']
-    ]
-  },
-  hotel:{
-    name:'Hotel / Alojamiento',ico:'🏨',
-    ticket:120,visits:1800,
-    problems:[
-      {ico:'phone',text:'Reservas y consultas fuera de horario sin respuesta',cost:'~25 reservas/mes a la competencia'},
-      {ico:'chat',text:'Sin chatbot multiidioma para huéspedes',cost:'Turistas internacionales sin atención'},
-      {ico:'calendar',text:'Sin upselling automático antes del check-in',cost:'Ingresos extra desaprovechados'},
-      {ico:'star',text:'Sin gestión activa de reseñas',cost:'Booking/Google rankings caen por falta de respuesta'}
-    ],
-    cases:[
-      {ico:'🏨',name:'Hotel Boutique Costa',loc:'Málaga',stats:['+41%','1 min','4.8★'],labels:['más reservas','respuesta','en Booking'],quote:'"Atendemos consultas en 5 idiomas sin ampliar plantilla."'}
-    ],
-    abItems:[
-      ['Reservas perdidas de noche','Chatbot atiende 24/7 multiidioma'],
-      ['Check-in solo presencial','Pre-check-in digital con upsell'],
-      ['Sin respuesta a reseñas','Respuestas automáticas en Google/Booking'],
-      ['Sin recomendaciones al huésped','Conserje IA por WhatsApp durante la estancia']
-    ]
-  },
-  otro:{
-    name:'Negocio local',ico:'🏪',
-    ticket:150,visits:400,
-    problems:[
-      {ico:'phone',text:'Clientes sin respuesta fuera de horario',cost:'~15 leads/mes perdidos'},
-      {ico:'chat',text:'Sin chatbot en la web',cost:'Visitantes se van sin dejar datos'},
-      {ico:'calendar',text:'Sin sistema de citas o reservas online',cost:'Proceso de compra largo = menos ventas'},
-      {ico:'star',text:'Sin automatización de seguimiento',cost:'Leads que se enfrían sin nurturing'}
-    ],
-    cases:[
-      {ico:'🏪',name:'Negocio Local XYZ',loc:'España',stats:['+40%','5 min','4.8★'],labels:['más leads','respuesta','en Google'],quote:'"WhiteMoon transformó nuestra captación digital."'}
-    ],
-    abItems:[
-      ['Sin respuesta fuera de horario','Chatbot atiende 24h los 365 días'],
-      ['Visitantes web sin convertir','Captura automática de leads'],
-      ['Sin reservas online','Sistema de citas digital'],
-      ['Sin seguimiento automático','Nurturing por WhatsApp automático']
-    ]
-  }
+var SD={
+  dental:{n:'Clínica Dental',i:'🦷',t:280,v:800,
+    p:[{i:'phone',tx:'Llamadas perdidas en horario de consulta',c:'~10 pacientes/mes van a la competencia'},
+       {i:'moon',tx:'Urgencias nocturnas sin atender',c:'Paciente que no vuelve = cliente perdido para siempre'},
+       {i:'cal',tx:'Sin citas online 24/7',c:'30% de leads se pierden fuera de horario'},
+       {i:'star',tx:'Sin gestión automática de reseñas Google',c:'Tu reputación digital no crece sola'}],
+    ab:[['Teléfono sin contestar de noche','Chatbot IA atiende urgencias 24/7'],
+        ['Paciente espera y llama a otro','Respuesta inmediata, siempre'],
+        ['Sin recordatorio de citas','WhatsApp automático → -65% no-shows'],
+        ['Agenda solo por teléfono','Reservas online con confirmación auto']],
+    case:{i:'🦷',b:'Clínica Dental Sonrisa',l:'Sevilla',s:['+43%','9min','4.9★'],lb:['más citas','respuesta','en Google'],q:'"El chatbot agenda mientras dormimos. Recuperamos la inversión en 6 semanas."'}},
+  restaurante:{n:'Restaurante',i:'🍽️',t:38,v:700,
+    p:[{i:'phone',tx:'Reservas perdidas cuando estáis en servicio',c:'~18 mesas/mes sin llenar'},
+       {i:'cart',tx:'Sin pedidos takeaway automatizados',c:'Canal de ingresos extra sin explotar'},
+       {i:'chat',tx:'WhatsApp sin respuesta automática',c:'Cliente sin respuesta = cliente perdido'},
+       {i:'star',tx:'Sin gestión de reseñas Google',c:'Competencia con más reseñas te gana'}],
+    ab:[['Reservas solo por teléfono','Reservas 24/7 por WhatsApp y web'],
+        ['Sin pedidos para llevar digital','Sistema de pedidos con carta online'],
+        ['Sin recordatorio de reserva','Confirmación automática anti no-show'],
+        ['Carta solo en papel','Carta digital con fotos accesible 24h']],
+    case:{i:'🍽️',b:'Restaurante El Rincón',l:'Valencia',s:['+41%','2min','4.8★'],lb:['más reservas','respuesta','en Google'],q:'"Las reservas de madrugada ahora se gestionan solas. Increíble."'}},
+  belleza:{n:'Centro de Estética',i:'💅',t:68,v:500,
+    p:[{i:'cal',tx:'Citas solo en horario de trabajo',c:'~14 citas/mes perdidas'},
+       {i:'phone',tx:'No-shows sin recordatorio previo',c:'20% de citas no se presentan'},
+       {i:'chat',tx:'Sin consulta de tratamientos 24h',c:'Clientas van a quien sí responde'},
+       {i:'star',tx:'Sin captación digital automatizada',c:'Solo creces por boca a boca'}],
+    ab:[['Solo citas en horario laboral','Reservas online 24/7 automáticas'],
+        ['No-shows frecuentes','Recordatorio automático -65% faltas'],
+        ['Sin info de tratamientos de noche','Chatbot asesora y reserva siempre'],
+        ['Sin captación de nuevas clientas','Leads digitales automáticos']],
+    case:{i:'💅',b:'Centro Lumière Beauty',l:'Madrid',s:['+54%','4min','4.9★'],lb:['más citas','respuesta','en Google'],q:'"Los no-shows bajaron un 68%. La inversión se recuperó en mes y medio."'}},
+  peluqueria:{n:'Peluquería',i:'✂️',t:48,v:400,
+    p:[{i:'cal',tx:'Agenda llena de llamadas para reservar',c:'Tiempo perdido gestionando el teléfono'},
+       {i:'phone',tx:'No-shows sin avisar',c:'~10 huecos vacíos/semana = dinero perdido'},
+       {i:'chat',tx:'Sin presencia digital activa',c:'Nuevas clientas no te encuentran online'},
+       {i:'star',tx:'Sin fidelización digital',c:'Clientas que no repiten'}],
+    ab:[['Reservas solo por llamada','Reservas por WhatsApp/web 24h'],
+        ['No-shows sin control','Recordatorio 24h antes -60% faltas'],
+        ['Sin galería de trabajos digital','Portfolio online con antes/después'],
+        ['Sin programa de fidelización','Bono automático para clientas frecuentes']],
+    case:{i:'✂️',b:'Peluquería Glamour',l:'Barcelona',s:['+46%','3min','4.8★'],lb:['más citas','respuesta','en Google'],q:'"Ahora las chicas reservan a las 11 de la noche sin llamarnos."'}},
+  abogado:{n:'Despacho de Abogados',i:'⚖️',t:650,v:300,
+    p:[{i:'phone',tx:'Consultas urgentes sin atender fuera de horario',c:'Cliente urgente llama al siguiente de la lista'},
+       {i:'chat',tx:'Sin cualificación automática de casos',c:'Tiempo perdido en consultas no rentables'},
+       {i:'cal',tx:'Sin agenda online de consultas',c:'Proceso de captación largo y manual'},
+       {i:'star',tx:'Sin presencia digital activa',c:'Clientes te buscan online y no te encuentran'}],
+    ab:[['Consultas urgentes sin atender','Chatbot recoge datos del caso 24/7'],
+        ['Leads sin cualificar','Cualificación automática por tipo de caso'],
+        ['Agenda manual por teléfono','Citas online con confirmación automática'],
+        ['Sin contenido digital útil','FAQ automático + posicionamiento SEO']],
+    case:{i:'⚖️',b:'Bufete García & Asociados',l:'Madrid',s:['+72%','7min','4.9★'],lb:['más consultas','respuesta','en Google'],q:'"El chatbot cualifica los casos antes. Solo atendemos los que nos interesan."'}},
+  gestoria:{n:'Gestoría / Asesoría',i:'📊',t:210,v:350,
+    p:[{i:'chat',tx:'Consultas básicas ocupan horas del equipo',c:'3h/día en preguntas que resuelve la IA'},
+       {i:'phone',tx:'Sin captación digital de autónomos',c:'Competencia con chatbot capta tus clientes'},
+       {i:'cal',tx:'Sin recordatorios de obligaciones fiscales',c:'Clientes insatisfechos por falta de proactividad'},
+       {i:'star',tx:'Sin seguimiento automatizado de leads',c:'Leads que se enfrían sin nurturing'}],
+    ab:[['Consultas básicas ocupan al equipo','Chatbot resuelve dudas 24/7 automáticamente'],
+        ['Solo captación por recomendación','Formularios inteligentes captan leads online'],
+        ['Sin recordatorios fiscales','Alertas automáticas de plazos importantes'],
+        ['Seguimiento manual y lento','Nurturing automático por WhatsApp']],
+    case:{i:'📊',b:'Gestoría Martínez',l:'Zaragoza',s:['+39%','4min','4.8★'],lb:['nuevos clientes','respuesta','en Google'],q:'"El chatbot responde las dudas básicas. Nosotros nos centramos en lo importante."'}},
+  taller:{n:'Taller Mecánico',i:'🚗',t:190,v:400,
+    p:[{i:'phone',tx:'Llamadas perdidas cuando estás en el foso',c:'~12 clientes/mes van a la competencia'},
+       {i:'cal',tx:'Sin citas online — todo por teléfono',c:'Clientes que no encuentran hueco y se van'},
+       {i:'chat',tx:'Sin recordatorio de revisiones y ITV',c:'Clientes que no vuelven por olvido'},
+       {i:'star',tx:'Sin presupuesto online automático',c:'Clientes que preguntan precio y no vuelven'}],
+    ab:[['Teléfono sin respuesta en obra','Chatbot atiende y agenda 24/7'],
+        ['Sin citas online','Sistema de citas digital con confirmación'],
+        ['Sin recordatorios de mantenimiento','Alertas ITV/revisiones automáticas'],
+        ['Presupuesto solo presencial','Presupuesto orientativo online instantáneo']],
+    case:{i:'🚗',b:'Taller Mecánico García',l:'Bilbao',s:['+47%','4min','4.7★'],lb:['más citas','respuesta','en Google'],q:'"Los recordatorios de ITV dispararon las revisiones. ROI en 7 semanas."'}},
+  veterinaria:{n:'Clínica Veterinaria',i:'🐾',t:98,v:500,
+    p:[{i:'phone',tx:'Urgencias nocturnas sin atender',c:'Dueño desesperado busca otro veterinario'},
+       {i:'cal',tx:'Sin recordatorio de vacunas y revisiones',c:'25% de pacientes no vuelven por olvido'},
+       {i:'chat',tx:'Sin triaje automático de urgencias',c:'Llamadas innecesarias saturan la clínica'},
+       {i:'star',tx:'Sin captación digital de nuevos pacientes',c:'Solo crecen por boca a boca'}],
+    ab:[['Urgencias nocturnas sin respuesta','Chatbot atiende y orienta 24/7'],
+        ['Sin recordatorio de vacunas','Alertas automáticas calendario sanitario'],
+        ['Triaje manual por teléfono','Triaje automático por síntomas'],
+        ['Captación solo presencial','Formulario de nueva mascota online']],
+    case:{i:'🐾',b:'Clínica Veterinaria Mar',l:'Alicante',s:['+53%','3min','4.9★'],lb:['más consultas','respuesta','en Google'],q:'"El recordatorio de vacunas ha disparado las visitas. Increíble herramienta."'}},
+  otro:{n:'Negocio Local',i:'🏪',t:150,v:400,
+    p:[{i:'phone',tx:'Clientes sin respuesta fuera de horario',c:'~15 leads/mes perdidos'},
+       {i:'chat',tx:'Sin chatbot en la web',c:'Visitantes se van sin dejar datos'},
+       {i:'cal',tx:'Sin sistema de citas o reservas online',c:'Proceso de compra largo = menos ventas'},
+       {i:'star',tx:'Sin automatización de seguimiento',c:'Leads que se enfrían sin nurturing'}],
+    ab:[['Sin respuesta fuera de horario','Chatbot atiende 24h los 365 días'],
+        ['Visitantes web sin convertir','Captura automática de leads'],
+        ['Sin reservas online','Sistema de citas digital'],
+        ['Sin seguimiento automático','Nurturing por WhatsApp automático']],
+    case:{i:'🏪',b:'Negocio Local XYZ',l:'España',s:['+41%','5min','4.8★'],lb:['más leads','respuesta','en Google'],q:'"WhiteMoon transformó nuestra captación. Recuperamos la inversión en 2 meses."'}}
 };
 
-var SECTOR_IMAGES={
-  dental:{
-    hero:'https://images.unsplash.com/photo-1588776814546-1ffbb34c94a4?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&q=70'
-  },
-  restaurante:{
-    hero:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&q=70'
-  },
-  belleza:{
-    hero:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=70'
-  },
-  peluqueria:{
-    hero:'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&q=70'
-  },
-  abogado:{
-    hero:'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=70'
-  },
-  gestoria:{
-    hero:'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=70'
-  },
-  taller:{
-    hero:'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1632823469850-2f77dd9c7f93?w=400&q=70'
-  },
-  veterinaria:{
-    hero:'https://images.unsplash.com/photo-1548767797-d8c844163c4a?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=70'
-  },
-  inmobiliaria:{
-    hero:'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&q=70'
-  },
-  academia:{
-    hero:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=70'
-  },
-  gimnasio:{
-    hero:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&q=70'
-  },
-  farmacia:{
-    hero:'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1576602976047-174e57a47881?w=400&q=70'
-  },
-  fisioterapia:{
-    hero:'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=70'
-  },
-  hotel:{
-    hero:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1455587734955-081b22074882?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&q=70'
-  },
-  otro:{
-    hero:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=70',
-    team:'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&q=70',
-    problem:'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400&q=70'
-  }
-};
-
-var svgIcons={
-  phone:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/>',
-  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+var IC={
+  phone:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
   chat:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
   cart:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>',
-  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  moon:'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>',
+  chk:'<polyline points="20 6 9 17 4 12"/>',
+  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
 };
+function si(n,c,s){return'<svg viewBox="0 0 24 24" style="width:'+(s||13)+'px;height:'+(s||13)+'px;stroke:'+c+';fill:none;stroke-width:2">'+IC[n]+'</svg>'}
 
-function startPresentation(){
-  BIZ = document.getElementById('s-biz').value.trim() || 'Tu negocio';
-  CONTACT = document.getElementById('s-contact').value.trim();
-  SECTOR = document.getElementById('s-sector').value || 'otro';
-  SCORE_SIT = document.getElementById('s-score').value || 'sin-chatbot';
-
-  if(!document.getElementById('s-sector').value){
-    alert('Por favor selecciona el sector del negocio');
-    return;
-  }
-
-  buildSlides();
+function startKit(){
+  BIZ=document.getElementById('s-biz').value.trim()||'Tu negocio';
+  CONTACT=document.getElementById('s-contact').value.trim();
+  SECTOR=document.getElementById('s-sector').value||'otro';
+  SIT=document.getElementById('s-score').value||'sin-chatbot';
+  TICKET=parseInt(document.getElementById('s-ticket').value)||0;
+  CALLS=parseInt(document.getElementById('s-calls').value)||8;
+  if(!document.getElementById('s-sector').value){alert('Selecciona el sector');return}
+  build();
   document.getElementById('setup').style.display='none';
   document.getElementById('slides').style.display='block';
-  document.getElementById('slide-nav').style.display='flex';
-  buildDots();
-  goToSlide(0);
+  document.getElementById('snav').style.display='flex';
+  ['c1','c2','c3'].forEach(function(id){document.getElementById(id).style.opacity='0'});
+  mkDots();goTo(0);
 }
 
-function buildSlides(){
-  var d = SECTOR_DATA[SECTOR] || SECTOR_DATA.otro;
-  var imgs = SECTOR_IMAGES[SECTOR] || SECTOR_IMAGES.otro;
-  var score = SCORE_SIT==='todo-mal'?22:SCORE_SIT==='sin-web'?35:SCORE_SIT==='sin-chatbot'?48:55;
-
-  var visits = parseInt(document.getElementById('s-visits').value,10) || d.visits;
-  var ticket = parseInt(document.getElementById('s-ticket').value,10) || d.ticket;
-  var calls  = parseInt(document.getElementById('s-calls').value,10) || 10;
-
-  // datos reales: llamadas perdidas/mes × ticket × tasa conversión 30%
-  var lost = Math.round((calls * 4) * ticket * 0.3);
-  var lostFmt = lost.toLocaleString('es-ES')+'€';
+function build(){
+  var d=SD[SECTOR]||SD.otro;
+  var tk=TICKET||d.t;
+  var cm=CALLS*4;
+  var sc=SIT==='todo-mal'?22:SIT==='sin-web'?35:SIT==='sin-chatbot'?48:55;
+  var lost=Math.round(cm*tk*0.3);
+  var lf=lost.toLocaleString('es-ES')+'€';
+  var big=SIT==='todo-mal'||SIT==='sin-web';
 
   // S1
-  document.getElementById('p-biz-1').textContent = BIZ;
-  document.getElementById('p-sector-1').textContent = d.ico+' '+d.name;
-  document.getElementById('p-hero-1').src = imgs.hero;
+  document.getElementById('p1-biz').textContent=BIZ;
+  document.getElementById('t1-biz').textContent=BIZ;
+  document.getElementById('t1-sec').textContent=d.i+' '+d.n;
+  document.getElementById('p1-date').textContent=new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});
 
-  // Imágenes sectoriales
-  document.getElementById('p-problem-img').src = imgs.problem;
-  document.getElementById('p-team-img').src = imgs.team;
-  document.getElementById('p-hero-10').src = imgs.team;
-
-  // S2 - Diagnóstico
-  document.getElementById('p-score').textContent = score+'%';
-  document.getElementById('p-score').style.color = score<40?'#ef4444':score<60?'#f97316':'#22c55e';
-  var bar = document.getElementById('p-score-bar');
+  // S2
+  document.getElementById('p2-biz').textContent=BIZ;
+  document.getElementById('p2-score').textContent=sc+'%';
+  document.getElementById('p2-score').style.color=sc<40?'#ef4444':sc<60?'#f97316':'#22c55e';
   setTimeout(function(){
-    bar.style.width=score+'%';
-    bar.style.background=score<40?'linear-gradient(90deg,#ef4444,#f97316)':score<60?'linear-gradient(90deg,#f97316,#eab308)':'linear-gradient(90deg,#22c55e,#16a34a)';
-  },600);
-
-  var diagItems=[
-    {ico:'💬',label:'Chatbot IA',val:SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-chatbot'?'Sin chatbot':'Básico',bad:SCORE_SIT!=='todo-bien'},
-    {ico:'📱',label:'WhatsApp Business',val:SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-wa'?'No activo':'Activo',bad:SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-wa'},
-    {ico:'🔍',label:'SEO Local',val:score<50?'Mejorable':'Correcto',bad:score<50},
-    {ico:'📅',label:'Reservas Online',val:SCORE_SIT==='todo-mal'?'Sin sistema':'Manual',bad:true}
+    var b=document.getElementById('p2-bar');
+    b.style.width=sc+'%';
+    b.style.background=sc<40?'linear-gradient(90deg,#ef4444,#f97316)':sc<60?'linear-gradient(90deg,#f97316,#eab308)':'linear-gradient(90deg,#22c55e,#86efac)';
+  },500);
+  var dm=[
+    {l:'Chatbot IA',v:SIT==='sin-chatbot'||SIT==='todo-mal'?'❌ No detectado':'⚠️ Básico',bad:true},
+    {l:'WhatsApp Bot',v:SIT==='sin-wa'||SIT==='todo-mal'?'❌ Sin bot':'⚠️ Manual',bad:true},
+    {l:'SEO Local',v:sc<50?'⚠️ Mejorable':'✓ Correcto',bad:sc<50},
+    {l:'Reservas Online',v:SIT==='todo-mal'?'❌ Sin sistema':'⚠️ Manual',bad:true}
   ];
-  var dg=document.getElementById('p-diag-grid');
-  dg.innerHTML=diagItems.map(function(i){
-    return'<div class="diag-card '+(i.bad?'bad':'good')+'">'+
-      '<div class="diag-ico">'+i.ico+'</div>'+
-      '<div class="diag-label">'+i.label+'</div>'+
-      '<div class="diag-val '+(i.bad?'red':'green')+'">'+i.val+'</div>'+
-    '</div>';
+  document.getElementById('p2-metrics').innerHTML=dm.map(function(m){
+    return'<div class="mc"><div style="font-size:.57rem;color:var(--text2);margin-bottom:5px;letter-spacing:.05em">'+m.l+'</div>'+
+      '<div style="font-size:.85rem;font-weight:600;color:'+(m.bad?'#ef4444':'#22c55e')+'">'+m.v+'</div></div>';
+  }).join('');
+  document.getElementById('t2-l1').textContent=SIT==='sin-chatbot'||SIT==='todo-mal'?'ERROR: Sin chatbot IA detectado':'WARN: Chatbot básico · potencial sin explotar';
+  document.getElementById('t2-l2').textContent='WARN: ~'+cm+' consultas/mes perdidas · '+lf+' en riesgo';
+
+  // S3
+  if(CONTACT) document.getElementById('p3-sub').textContent=CONTACT+', esto es lo que pasa en '+BIZ+' ahora mismo:';
+  document.getElementById('p3-probs').innerHTML=d.p.map(function(p){
+    return'<div class="acard red" style="margin-bottom:8px">'+
+      '<div class="acard-top"><div class="acard-ico i-red">'+si(p.i,'#ef4444')+'</div>'+
+      '<div class="acard-title">'+p.tx+'</div></div>'+
+      '<div class="acard-tag err">→ '+p.c+'</div></div>';
   }).join('');
 
-  // S3 - Problemas
-  if(CONTACT) document.getElementById('p-contact-greeting').textContent=
-    CONTACT+', te lo mostramos con datos reales del sector '+d.name.toLowerCase()+':';
-
-  document.getElementById('p-problems').innerHTML=d.problems.map(function(p){
-    return'<div class="problem-item">'+
-      '<div class="prob-ico"><svg viewBox="0 0 24 24">'+svgIcons[p.ico]+'</svg></div>'+
-      '<div><div class="prob-text">'+p.text+'</div>'+
-      '<div class="prob-cost">'+p.cost+'</div></div>'+
-    '</div>';
-  }).join('');
-
-  // S4 - Dinero perdido
-  document.getElementById('p-lost').textContent = lostFmt;
-  var breakdownItems=[
-    {num:Math.round(lost*0.4).toLocaleString('es-ES')+'€',label:'Leads perdidos fuera de horario'},
-    {num:Math.round(lost*0.3).toLocaleString('es-ES')+'€',label:'Citas/reservas sin confirmar'},
-    {num:Math.round(lost*0.2).toLocaleString('es-ES')+'€',label:'Clientes que no repiten'},
-    {num:Math.round(lost*0.1).toLocaleString('es-ES')+'€',label:'Oportunidades sin seguimiento'}
+  // S4
+  document.getElementById('p4-lost').textContent=lf;
+  document.getElementById('t4-calc').textContent=cm+' consultas × '+tk+'€ × 30% = '+lf+'/mes';
+  var bk=[
+    {n:Math.round(lost*.45).toLocaleString('es-ES')+'€',l:'Consultas sin respuesta'},
+    {n:Math.round(lost*.3).toLocaleString('es-ES')+'€',l:'Citas no confirmadas'},
+    {n:Math.round(lost*.15).toLocaleString('es-ES')+'€',l:'Clientes que no repiten'},
+    {n:Math.round(lost*.1).toLocaleString('es-ES')+'€',l:'Leads sin seguimiento'}
   ];
-  document.getElementById('p-money-breakdown').innerHTML=breakdownItems.map(function(i){
-    return'<div class="money-item">'+
-      '<div class="money-item-num">'+i.num+'</div>'+
-      '<div class="money-item-label">'+i.label+'</div>'+
-    '</div>';
+  document.getElementById('p4-breakdown').innerHTML=bk.map(function(b){
+    return'<div class="mc"><div class="mc-val" style="color:#ef4444;font-size:1.3rem">'+b.n+'</div><div class="mc-label">'+b.l+'</div></div>';
   }).join('');
 
-  // S5 - Soluciones
-  var sols=[
-    {ico:'chat',title:'Chatbot IA 24/7',price:'Pack Advance — 149€/mes',feats:['Responde consultas automáticamente','Captura leads mientras duermes','Agenda citas sin intervención humana','Integración WhatsApp Business']},
-    {ico:'calendar',title:'Web Profesional + IA',price:'Pack Pyme — 1.800€ único',feats:['Web nueva con chatbot integrado','Sistema de reservas online','SEO optimizado desde el día 1','Operativo en 5-7 días']}
-  ];
-  document.getElementById('p-solutions').innerHTML=sols.map(function(s){
-    return'<div class="solution-card">'+
-      '<div class="sol-header">'+
-        '<div class="sol-ico"><svg viewBox="0 0 24 24">'+svgIcons[s.ico]+'</svg></div>'+
-        '<div><div class="sol-title">'+s.title+'</div>'+
-        '<div class="sol-price">'+s.price+'</div></div>'+
-      '</div>'+
-      '<div class="sol-features">'+s.feats.map(function(f){
-        return'<div class="sol-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f+'</div>';
-      }).join('')+'</div>'+
-    '</div>';
+  // S5
+  var sols=[{i:'chat',cl:'pur',t:'Chatbot IA 24/7 para '+BIZ,p:'Pack Advance · 149€/mes + 299€ setup',
+    f:['Responde consultas automáticamente','Captura leads mientras duermes','Agenda citas sin intervención humana','Integración WhatsApp Business']}];
+  if(big) sols.push({i:'cal',cl:'cya',t:'Web Profesional + Chatbot IA',p:'Pack Pyme · 1.800€ pago único',
+    f:['Web nueva con chatbot integrado','Sistema de reservas online','SEO desde el día 1','Operativo en 5-7 días']});
+  document.getElementById('p5-sols').innerHTML=sols.map(function(s){
+    return'<div class="acard '+s.cl+'" style="margin-bottom:9px">'+
+      '<div class="acard-top"><div class="acard-ico i-'+s.cl+'">'+si(s.i,'currentColor')+'</div>'+
+      '<div><div class="acard-title">'+s.t+'</div>'+
+      '<div style="font-size:.58rem;color:var(--p);font-family:Space Mono,monospace;margin-top:2px">'+s.p+'</div></div></div>'+
+      '<div style="display:flex;flex-direction:column;gap:5px">'+s.f.map(function(f){
+        return'<div style="display:flex;align-items:center;gap:7px;font-size:.74rem;color:var(--text2)">'+si('chk','#22c55e')+f+'</div>';
+      }).join('')+'</div></div>';
   }).join('');
 
-  // S6 - ROI
-  var beforeConv=2,afterConv=9;
-  var leadsMonth=Math.round(visits*0.002*30);
-  var revenueAfter=Math.round(leadsMonth*(afterConv/100)*ticket);
-  document.getElementById('roi-payback').textContent=SCORE_SIT==='todo-mal'?'3 meses':'2 meses';
-  document.getElementById('roi-euros').innerHTML=
-    '<div class="money-item"><div class="money-item-num" style="color:#ef4444">'+
-    Math.round(leadsMonth*(beforeConv/100)*ticket).toLocaleString('es-ES')+'€</div>'+
-    '<div class="money-item-label">ingresos/mes actuales estimados</div></div>'+
-    '<div class="money-item"><div class="money-item-num" style="color:#22c55e">'+
-    revenueAfter.toLocaleString('es-ES')+'€</div>'+
-    '<div class="money-item-label">ingresos/mes con WhiteMoon</div></div>';
+  // S6
+  var rA=Math.round(cm*(9/100)*tk),rB=Math.round(cm*(2/100)*tk);
+  document.getElementById('p6-euros').innerHTML=
+    '<div class="mc"><div class="mc-val" style="color:#ef4444;font-size:1.3rem">'+rB.toLocaleString('es-ES')+'€</div><div class="mc-label">ingresos/mes estimados actuales</div></div>'+
+    '<div class="mc"><div class="mc-val" style="color:#22c55e;font-size:1.3rem">'+rA.toLocaleString('es-ES')+'€</div><div class="mc-label">ingresos/mes con WhiteMoon</div></div>';
+  document.getElementById('p6-payback').textContent=big?'3-4 meses':'2 meses';
 
-  // S7 - Antes/Después
-  document.getElementById('p-ab').innerHTML=d.abItems.map(function(item){
+  // S7
+  document.getElementById('p7-ab').innerHTML=d.ab.map(function(r){
     return'<div class="ab-row">'+
-      '<div class="ab-item bad"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'+item[0]+'</div>'+
-      '<div class="ab-item good"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+item[1]+'</div>'+
+      '<div class="ab-item b"><div class="ab-i">'+si('x','#ef4444')+'</div>'+r[0]+'</div>'+
+      '<div class="ab-item g"><div class="ab-i">'+si('chk','#22c55e')+'</div>'+r[1]+'</div>'+
     '</div>';
   }).join('');
 
-  // S8 - Casos
-  document.getElementById('p-cases').innerHTML=d.cases.map(function(c){
-    return'<div class="case-card">'+
-      '<img class="case-img" loading="lazy" src="'+imgs.hero+'" alt="">'+
-      '<div class="case-header">'+
-        '<div class="case-avatar" style="background:rgba(139,92,246,.1)">'+c.ico+'</div>'+
-        '<div><div class="case-biz">'+c.name+'</div>'+
-        '<div class="case-sector">'+c.loc+' · '+d.name+'</div></div>'+
+  // S8
+  var c=d.case;
+  document.getElementById('p8-cases').innerHTML=
+    '<div class="ccase">'+
+      '<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">'+
+        '<div style="width:34px;height:34px;border-radius:9px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;font-size:1rem">'+c.i+'</div>'+
+        '<div><div style="font-size:.82rem;font-weight:700;color:#fff">'+c.b+'</div>'+
+        '<div style="font-size:.62rem;color:var(--text2)">'+c.l+' · '+d.n+'</div></div>'+
       '</div>'+
-      '<div class="case-stats">'+c.stats.map(function(s,i){
-        return'<div class="case-stat">'+
-          '<div class="case-stat-num">'+s+'</div>'+
-          '<div class="case-stat-label">'+c.labels[i]+'</div>'+
-        '</div>';
-      }).join('')+'</div>'+
-      '<div class="case-quote">'+c.quote+'</div>'+
+      '<div class="cs-stats">'+c.s.map(function(s,i){return'<div><div class="cs-sn">'+s+'</div><div class="cs-sl">'+c.lb[i]+'</div></div>'}).join('')+'</div>'+
+      '<div class="cs-q">'+c.q+'</div>'+
+    '</div>'+
+    '<div class="acard pur">'+
+      '<div class="acard-top"><div class="acard-ico i-cya">'+si('star','currentColor')+'</div>'+
+      '<div class="acard-title">¿Por qué funciona?</div></div>'+
+      '<div class="acard-sub">El 73% de clientes elige al proveedor que responde primero. Con WhiteMoon, '+BIZ+' responde en segundos, las 24h del día.</div>'+
     '</div>';
-  }).join('');
 
-  // S9 - Precio
-  var isLarge=SCORE_SIT==='todo-mal'||SCORE_SIT==='sin-web';
-  var planName=isLarge?'Pack Pyme':'Pack Advance';
-  var planPrice=isLarge?'1.800€':'149€';
-  var planPeriod=isLarge?'pago único':'mes';
-  var planSetup=isLarge?'Incluye web + dominio + chatbot + reservas':'+ 299€ setup · Sin permanencia';
-  var planFeats=isLarge?
-    ['Web profesional completa','Dominio incluido 1 año','Chatbot IA personalizado','Sistema de reservas online','SEO optimizado','Operativo en 5-7 días']:
-    ['Chatbot IA conversacional 24/7','Captura leads automática','Integración WhatsApp Business','Dashboard de conversaciones','Activación en 48h','Sin permanencia'];
+  // S9
+  var pn=big?'Pack Pyme':'Pack Advance',pp=big?'1.800€':'149€',pperiod=big?'pago único':'/mes';
+  var ps=big?'// web + chatbot + reservas + SEO':'// + 299€ setup · sin permanencia';
+  var pf=big?['Web profesional completa','Dominio 1 año incluido','Chatbot IA personalizado','Reservas online integradas','SEO optimizado','Operativo en 5-7 días']:
+             ['Chatbot IA conversacional 24/7','Captura leads automática','WhatsApp Business integrado','Panel de conversaciones','Activación en 48 horas','Sin permanencia'];
+  document.getElementById('p9-title').textContent=pp+(big?'':'/mes');
+  document.getElementById('p9-card').innerHTML=
+    '<div class="pcard">'+
+    '<div class="p-tag">⭐ RECOMENDADO PARA '+BIZ.toUpperCase()+'</div>'+
+    '<div class="p-name">'+pn+'</div>'+
+    '<div class="p-amount">'+pp+'<span>'+pperiod+'</span></div>'+
+    '<div class="p-setup">'+ps+'</div>'+
+    '<div class="p-feats">'+pf.map(function(f){return'<div class="p-feat">'+si('chk','#22c55e')+f+'</div>'}).join('')+'</div>'+
+    '<a class="p-cta" href="https://wa.me/'+WA+'?text=Hola%2C+me+interesa+el+'+encodeURIComponent(pn)+'+para+'+encodeURIComponent(BIZ)+'" target="_blank">Contratar '+pn+' →</a>'+
+    '</div>';
 
-  document.getElementById('p-price-title').textContent=planPrice+(isLarge?'':'/mes');
-  document.getElementById('p-price-card').innerHTML=
-    '<div class="price-tag">⭐ RECOMENDADO PARA '+BIZ.toUpperCase()+'</div>'+
-    '<div class="price-name">'+planName+'</div>'+
-    '<div class="price-amount">'+planPrice+'<span>/'+planPeriod+'</span></div>'+
-    '<div class="price-setup">'+planSetup+'</div>'+
-    '<div class="price-features">'+planFeats.map(function(f){
-      return'<div class="price-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f+'</div>';
-    }).join('')+'</div>'+
-    '<a class="price-cta" href="https://wa.me/'+WA_NUM+'?text=Hola%2C+me+interesa+el+'+
-    encodeURIComponent(planName)+'+para+'+encodeURIComponent(BIZ)+'" target="_blank">'+
-    'Contratar '+planName+' →</a>';
-
-  // S10 - WA
-  document.getElementById('p-wa-btn').href=
-    'https://wa.me/'+WA_NUM+'?text=Hola%2C+acabo+de+ver+la+presentaci%C3%B3n+de+WhiteMoon+para+'+
-    encodeURIComponent(BIZ)+'.+Quiero+empezar+esta+semana.';
+  // S10
+  document.getElementById('p10-biz').textContent=BIZ;
+  document.getElementById('p10-steps').innerHTML=
+    ['Hoy — Confirmamos el pack y firmamos','Mañana — Configuramos tu agente IA personalizado','En 48h — '+BIZ+' ya capta leads automáticamente'].map(function(s,i){
+      var parts=s.split(' — ');
+      return'<div class="cstep"><div class="csn">'+(i+1)+'</div>'+
+        '<div class="cst"><b>'+parts[0]+'</b> — '+parts[1]+'</div></div>';
+    }).join('');
+  document.getElementById('p10-wa').href='https://wa.me/'+WA+'?text=Hola%2C+acabo+de+ver+la+presentaci%C3%B3n+de+WhiteMoon+para+'+encodeURIComponent(BIZ)+'.+Quiero+empezar+esta+semana.';
 }
 
-// NAVIGATION
-function buildDots(){
-  var c=document.getElementById('nav-dots');
-  c.innerHTML='';
-  for(var i=0;i<totalSlides;i++){
-    var d=document.createElement('div');
-    d.className='dot'+(i===0?' active':'');
-    d.onclick=(function(idx){return function(){goToSlide(idx)}})(i);
-    c.appendChild(d);
+// NAV
+function mkDots(){
+  var c=document.getElementById('dots');c.innerHTML='';
+  for(var i=0;i<TOT;i++){
+    var d=document.createElement('div');d.className='dot'+(i===0?' active':'');
+    d.onclick=(function(n){return function(){goTo(n)}})(i);c.appendChild(d);
   }
 }
-
-function updateDots(){
-  var dots=document.querySelectorAll('.dot');
-  dots.forEach(function(d,i){
-    d.classList.toggle('active',i===currentSlide);
-  });
-  document.getElementById('slide-counter').textContent=(currentSlide+1)+' / '+totalSlides;
-  var prevBtn=document.querySelector('.btn-prev');
-  var nextBtn=document.querySelector('.btn-next');
-  if(prevBtn) prevBtn.style.opacity=currentSlide===0?'0.3':'1';
-  if(nextBtn) nextBtn.textContent=currentSlide===totalSlides-1?'Cerrar ✕':'Siguiente →';
+function updDots(){
+  document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('active',i===cur)});
+  document.getElementById('sc').textContent=(cur+1)+' / '+TOT;
+  document.querySelector('.np').style.opacity=cur===0?'0.3':'1';
+  document.querySelector('.nn').textContent=cur===TOT-1?'Reiniciar ↺':'Siguiente →';
 }
-
-function goToSlide(n){
-  var slides=document.querySelectorAll('.slide');
-  slides.forEach(function(s,i){
+function goTo(n){
+  document.querySelectorAll('.slide').forEach(function(s,i){
     s.classList.remove('active','prev');
-    if(i<n) s.classList.add('prev');
+    if(i<n)s.classList.add('prev');
   });
-  slides[n].classList.add('active');
-  currentSlide=n;
-  updateDots();
+  document.querySelectorAll('.slide')[n].classList.add('active');
+  cur=n;updDots();
 }
-
-function nextSlide(){
-  if(currentSlide<totalSlides-1) goToSlide(currentSlide+1);
-  else{document.getElementById('slides').style.display='none';document.getElementById('slide-nav').style.display='none';document.getElementById('setup').style.display='flex';}
+function next(){
+  if(cur<TOT-1)goTo(cur+1);
+  else{
+    document.getElementById('slides').style.display='none';
+    document.getElementById('snav').style.display='none';
+    document.getElementById('setup').style.display='flex';
+    ['c1','c2','c3'].forEach(function(id){document.getElementById(id).style.opacity='1'});
+  }
 }
+function prev(){if(cur>0)goTo(cur-1)}
 
-function prevSlide(){
-  if(currentSlide>0) goToSlide(currentSlide-1);
-}
-
-// SWIPE
-var touchX=0;
-document.addEventListener('touchstart',function(e){touchX=e.touches[0].clientX});
-document.addEventListener('touchend',function(e){
-  var diff=touchX-e.changedTouches[0].clientX;
-  if(Math.abs(diff)>50){if(diff>0)nextSlide();else prevSlide();}
-});
-
-// KEYBOARD
-document.addEventListener('keydown',function(e){
-  if(e.key==='ArrowRight'||e.key==='ArrowDown') nextSlide();
-  if(e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
-});
+// Touch
+var tx=0;
+document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=tx-e.changedTouches[0].clientX;if(Math.abs(d)>45){if(d>0)next();else prev()}},{passive:true});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowDown')next();if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev()});
 </script>
 </body>
 </html>
