@@ -271,6 +271,29 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
 .wa-btn:active{transform:scale(.97)}
 .wa-btn svg{width:19px;height:19px;fill:#fff;flex-shrink:0}
 
+/* Demos en vivo */
+.demo-feat{position:relative;background:rgba(139,92,246,.08);border-radius:14px;padding:18px;margin:14px 0 16px}
+.demo-feat::before{content:'';position:absolute;inset:-1px;border-radius:15px;padding:1px;
+  background:linear-gradient(135deg,var(--p),var(--accent),var(--cyan),var(--accent2),var(--p));
+  background-size:300% 300%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  animation:demoBord 5s linear infinite;pointer-events:none}
+@keyframes demoBord{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.demo-badge{position:absolute;top:-10px;left:16px;background:var(--green);color:#000;
+  font-size:.58rem;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:.06em;z-index:1}
+.demo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.demo-mini{background:rgba(10,10,28,.85);border:1px solid var(--border);border-radius:10px;padding:9px 8px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px}
+.demo-mini-ico{width:28px;height:28px;border-radius:7px;background:rgba(139,92,246,.1);
+  display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.demo-mini-name{font-size:.6rem;font-weight:600;color:#fff;line-height:1.2;min-height:28px;display:flex;align-items:center}
+.demo-mini-btn{display:block;width:100%;text-align:center;padding:5px;background:rgba(139,92,246,.12);
+  border:1px solid rgba(139,92,246,.25);border-radius:6px;color:var(--accent);
+  text-decoration:none;font-size:.6rem;font-weight:700;letter-spacing:.04em}
+.demo-others-h{font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text2);margin:14px 0 8px;font-family:'Space Mono',monospace}
+
 /* Anims */
 @keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
 .slide.active .sw>*{animation:fadeUp .4s ease both}
@@ -434,8 +457,18 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
 </div>
 
-<!-- S6 ROI -->
+<!-- S6 DEMOS EN VIVO -->
 <div class="slide" id="s6">
+  <div class="sw">
+    <div class="sbadge"><div class="sbdot"></div>Demo en vivo</div>
+    <div class="stitle">Así quedaría la web<br>de <span class="grad" id="p-demos-biz">tu negocio</span> con IA</div>
+    <div class="ssub">Mira cómo funciona un chatbot IA real en un negocio como el tuyo.</div>
+    <div id="p-demos"></div>
+  </div>
+</div>
+
+<!-- S7 ROI -->
+<div class="slide" id="s7">
   <div class="sw">
     <div class="sbadge"><div class="sbdot"></div>Retorno de inversión</div>
     <div class="stitle">Multiplicas<br><span class="grad-g">tu conversión</span></div>
@@ -460,8 +493,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
 </div>
 
-<!-- S7 ANTES/DESPUÉS -->
-<div class="slide" id="s7">
+<!-- S8 ANTES/DESPUÉS -->
+<div class="slide" id="s8">
   <div class="sw">
     <div class="sbadge"><div class="sbdot"></div>Transformación digital</div>
     <div class="stitle">Antes y después<br>de <span class="grad">WhiteMoon</span></div>
@@ -473,8 +506,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
 </div>
 
-<!-- S8 CASOS -->
-<div class="slide" id="s8">
+<!-- S9 CASOS -->
+<div class="slide" id="s9">
   <div class="sw">
     <div class="sbadge"><div class="sbdot"></div>Casos reales verificados</div>
     <div class="stitle">Negocios que ya<br>usan <span class="grad">IA WhiteMoon</span></div>
@@ -482,8 +515,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
 </div>
 
-<!-- S9 PRECIO -->
-<div class="slide" id="s9">
+<!-- S10 PRECIO -->
+<div class="slide" id="s10">
   <div class="sw">
     <div class="sbadge"><div class="sbdot"></div>Tu plan recomendado</div>
     <div class="stitle">Empieza desde<br><span class="grad" id="p9-title">149€/mes</span></div>
@@ -498,8 +531,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   </div>
 </div>
 
-<!-- S10 CIERRE -->
-<div class="slide" id="s10">
+<!-- S11 CIERRE -->
+<div class="slide" id="s11">
   <div class="sw" style="display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 80px)">
     <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--green);letter-spacing:.15em;margin-bottom:13px">▶ SIGUIENTE PASO</div>
     <div class="tech-bar"></div>
@@ -520,13 +553,13 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:
   <button class="nb np" onclick="prev()">← Atrás</button>
   <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
     <div class="dots" id="dots"></div>
-    <div class="sc" id="sc">1 / 10</div>
+    <div class="sc" id="sc">1 / 11</div>
   </div>
   <button class="nb nn" onclick="next()">Siguiente →</button>
 </div>
 
 <script>
-var BIZ='',CONTACT='',SECTOR='',SIT='',TICKET=0,CALLS=8,cur=0,TOT=10,WA='34643199580';
+var BIZ='',CONTACT='',SECTOR='',SIT='',TICKET=0,CALLS=8,cur=0,TOT=11,WA='34643199580';
 
 var SD={
   dental:{n:'Clínica Dental',i:'🦷',t:280,v:800,
@@ -634,6 +667,37 @@ var IC={
 };
 function si(n,c,s){return'<svg viewBox="0 0 24 24" style="width:'+(s||13)+'px;height:'+(s||13)+'px;stroke:'+c+';fill:none;stroke-width:2">'+IC[n]+'</svg>'}
 
+var DEMO_IC={
+  dental:'<path d="M12 2C8 2 6 4 6 7c0 2 1 4 1 7s.5 6 2 6 1.5-3 3-3 1.5 3 3 3 2-3 2-6 1-5 1-7c0-3-2-5-6-5z"/>',
+  restaurante:'<path d="M5 2v8a2 2 0 002 2v9m0-19v8m4-8v6a2 2 0 01-2 2m9-8v19m0-9h-3a2 2 0 01-2-2V4"/>',
+  belleza:'<path d="M12 2l2 5 5 1-4 4 1 6-4-3-4 3 1-6-4-4 5-1z"/>',
+  peluqueria:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>',
+  abogado:'<line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7l7-2 7 2"/><path d="M2 14l3-7 3 7c0 1.5-1.5 3-3 3s-3-1.5-3-3z"/><path d="M16 14l3-7 3 7c0 1.5-1.5 3-3 3s-3-1.5-3-3z"/>',
+  gestoria:'<line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/>',
+  taller:'<path d="M5 17h14l-2-7H7z"/><path d="M5 17v3h2v-3M17 17v3h2v-3"/><circle cx="8" cy="17" r="1.5"/><circle cx="16" cy="17" r="1.5"/>',
+  veterinaria:'<circle cx="6" cy="9" r="2"/><circle cx="10" cy="5" r="2"/><circle cx="14" cy="5" r="2"/><circle cx="18" cy="9" r="2"/><path d="M8 15c0-2 2-4 4-4s4 2 4 4-2 6-4 6-4-4-4-6z"/>',
+  fisioterapia:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  academia:'<path d="M4 19.5A2.5 2.5 0 016.5 17H20V2H6.5A2.5 2.5 0 004 4.5z"/><path d="M4 19.5A2.5 2.5 0 016.5 22H20V17"/>',
+  cocinas:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><circle cx="8" cy="14" r="1.5"/><circle cx="16" cy="14" r="1.5"/>',
+  muebles:'<path d="M2 12h20v6H2z"/><path d="M4 12V8a2 2 0 012-2h12a2 2 0 012 2v4"/><line x1="6" y1="18" x2="6" y2="21"/><line x1="18" y1="18" x2="18" y2="21"/>'
+};
+function di(k,sz){return'<svg viewBox="0 0 24 24" style="width:'+sz+'px;height:'+sz+'px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">'+(DEMO_IC[k]||DEMO_IC.cocinas)+'</svg>'}
+
+var DEMOS_MAP={
+  dental:{url:'https://nexusforgeia.github.io/WHITEMOON-CLINICAS-DENTALES/',label:'Clínica Dental',desc:'Citas, urgencias y captación 24h'},
+  restaurante:{url:'https://nexusforgeia.github.io/WHITEMOON-RESTAURANTES/',label:'Restaurante / Sushi',desc:'Reservas y pedidos con chatbot'},
+  belleza:{url:'https://nexusforgeia.github.io/WHITEMOON-ESTETICA/',label:'Centro de Estética',desc:'Citas y tratamientos 24h'},
+  peluqueria:{url:'https://nexusforgeia.github.io/WHITEMOON-PELUQUERIAS/',label:'Peluquería',desc:'Reservas online sin llamadas'},
+  abogado:{url:'https://nexusforgeia.github.io/WHITEMOON-ABOGADOS/',label:'Despacho de Abogados',desc:'Captación y cualificación 24h'},
+  gestoria:{url:'https://nexusforgeia.github.io/WHITEMOON-GESTORIAS/',label:'Gestoría / Asesoría',desc:'Leads y consultas automatizadas'},
+  taller:{url:'https://nexusforgeia.github.io/WHITEMOON-TALLERES-COCHES/',label:'Taller Mecánico',desc:'Citas y recordatorios ITV'},
+  veterinaria:{url:'https://nexusforgeia.github.io/WHITEMOON-VETERINARIOS/',label:'Clínica Veterinaria',desc:'Urgencias y vacunas 24h'},
+  fisioterapia:{url:'https://nexusforgeia.github.io/WHITEMOON-PODOLOGOS/',label:'Fisioterapia / Podología',desc:'Citas y seguimiento de pacientes'},
+  academia:{url:'https://nexusforgeia.github.io/WHITEMOON-CENTROS-FORMACION/',label:'Academia / Formación',desc:'Matrículas e información 24h'},
+  cocinas:{url:'https://nexusforgeia.github.io/WHITEMOON-COCINAS/',label:'Cocinas a medida',desc:'Cualificación de proyectos'},
+  muebles:{url:'https://nexusforgeia.github.io/WHITEMOON-MUEBLES/',label:'Tienda de Muebles',desc:'Asesoramiento y ventas 24h'}
+};
+
 function startKit(){
   BIZ=document.getElementById('s-biz').value.trim()||'Tu negocio';
   CONTACT=document.getElementById('s-contact').value.trim();
@@ -724,14 +788,43 @@ function build(){
       }).join('')+'</div></div>';
   }).join('');
 
-  // S6
+  // S6 DEMOS EN VIVO
+  document.getElementById('p-demos-biz').textContent=BIZ;
+  var feat=DEMOS_MAP[SECTOR];
+  var dKeys=Object.keys(DEMOS_MAP).filter(function(k){return k!==SECTOR});
+  var dHtml='';
+  if(feat){
+    dHtml+='<div class="demo-feat">'+
+      '<div class="demo-badge">★ TU SECTOR</div>'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-top:2px">'+
+        '<div style="width:48px;height:48px;border-radius:11px;background:rgba(139,92,246,.18);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0">'+di(SECTOR,28)+'</div>'+
+        '<div><div style="font-size:.95rem;font-weight:700;color:#fff;line-height:1.2">'+feat.label+'</div>'+
+        '<div style="font-size:.7rem;color:var(--text2);margin-top:3px;line-height:1.4">'+feat.desc+'</div></div>'+
+      '</div>'+
+      '<a href="'+feat.url+'" target="_blank" rel="noopener" style="display:block;margin-top:14px;padding:11px;text-align:center;background:linear-gradient(135deg,var(--p),var(--p2));border-radius:9px;color:#fff;text-decoration:none;font-size:.82rem;font-weight:700;letter-spacing:.02em">Ver demo en vivo →</a>'+
+    '</div>';
+  }
+  if(dKeys.length){
+    dHtml+='<div class="demo-others-h">// '+(feat?'MÁS SECTORES':'DEMOS DISPONIBLES')+'</div>';
+    dHtml+='<div class="demo-grid">'+dKeys.map(function(k){
+      var x=DEMOS_MAP[k];
+      return'<div class="demo-mini">'+
+        '<div class="demo-mini-ico">'+di(k,16)+'</div>'+
+        '<div class="demo-mini-name">'+x.label+'</div>'+
+        '<a class="demo-mini-btn" href="'+x.url+'" target="_blank" rel="noopener">Ver →</a>'+
+      '</div>';
+    }).join('')+'</div>';
+  }
+  document.getElementById('p-demos').innerHTML=dHtml;
+
+  // S7 ROI
   var rA=Math.round(cm*(9/100)*tk),rB=Math.round(cm*(2/100)*tk);
   document.getElementById('p6-euros').innerHTML=
     '<div class="mc"><div class="mc-val" style="color:#ef4444;font-size:1.3rem">'+rB.toLocaleString('es-ES')+'€</div><div class="mc-label">ingresos/mes estimados actuales</div></div>'+
     '<div class="mc"><div class="mc-val" style="color:#22c55e;font-size:1.3rem">'+rA.toLocaleString('es-ES')+'€</div><div class="mc-label">ingresos/mes con WhiteMoon</div></div>';
   document.getElementById('p6-payback').textContent=big?'3-4 meses':'2 meses';
 
-  // S7
+  // S8 ANTES/DESPUÉS
   document.getElementById('p7-ab').innerHTML=d.ab.map(function(r){
     return'<div class="ab-row">'+
       '<div class="ab-item b"><div class="ab-i">'+si('x','#ef4444')+'</div>'+r[0]+'</div>'+
@@ -739,7 +832,7 @@ function build(){
     '</div>';
   }).join('');
 
-  // S8
+  // S9 CASOS
   var c=d.case;
   document.getElementById('p8-cases').innerHTML=
     '<div class="ccase">'+
@@ -757,7 +850,7 @@ function build(){
       '<div class="acard-sub">El 73% de clientes elige al proveedor que responde primero. Con WhiteMoon, '+BIZ+' responde en segundos, las 24h del día.</div>'+
     '</div>';
 
-  // S9
+  // S10 PRECIO
   var pn=big?'Pack Pyme':'Pack Advance',pp=big?'1.800€':'149€',pperiod=big?'pago único':'/mes';
   var ps=big?'// web + chatbot + reservas + SEO':'// + 299€ setup · sin permanencia';
   var pf=big?['Web profesional completa','Dominio 1 año incluido','Chatbot IA personalizado','Reservas online integradas','SEO optimizado','Operativo en 5-7 días']:
@@ -773,7 +866,7 @@ function build(){
     '<a class="p-cta" href="https://wa.me/'+WA+'?text=Hola%2C+me+interesa+el+'+encodeURIComponent(pn)+'+para+'+encodeURIComponent(BIZ)+'" target="_blank">Contratar '+pn+' →</a>'+
     '</div>';
 
-  // S10
+  // S11 CIERRE
   document.getElementById('p10-biz').textContent=BIZ;
   document.getElementById('p10-steps').innerHTML=
     ['Hoy — Confirmamos el pack y firmamos','Mañana — Configuramos tu agente IA personalizado','En 48h — '+BIZ+' ya capta leads automáticamente'].map(function(s,i){
